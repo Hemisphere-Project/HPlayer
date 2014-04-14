@@ -81,19 +81,19 @@ HPlayer supports various command line arguments:
 Once started, HPlayer can be controlled with OSC commands over the network.
 The available commands are:
 
-	/play [<file1>] [<file2>] ...	:	Play the file list in order (absolute or relative ~/video/ path)
-	/playloop [<file1>] [<file2>] ...	:	Same as play with loop at the end
-	/player			:	Rewind and play the last active file	
-	/stop			:	Stop and rewind the current video file
-	/pause			:	Pause the video file
-	/resume			:	Resume the paused file
-	/next			:	Play the next file in the list
-	/volume <value> 	:	Set volume from 0.0 to 1.0 or from 0 to 100 (auto detect value format)
-	/mute			:	Mute the sound of the video
-	/unmute			:	Unmute the sound of the video (restore last known volume)
-	/info			:	Toggle media info window
-	/fx/<shader> <values> 	:	Apply the specified <shader> with given <values>
-	/quit			:	Exit the program
+/play [<file1>] [<file2>] ...	:	Play the file list in order (absolute or relative ~/video/ path)
+/playloop [<file1>] [<file2>] ...	:	Same as play with loop at the end
+/player			:	Rewind and play the last active file	
+/stop			:	Stop and rewind the current video file
+/pause			:	Pause the video file
+/resume			:	Resume the paused file
+/next			:	Play the next file in the list
+/volume <value> 	:	Set volume from 0.0 to 1.0 or from 0 to 100 (auto detect value format)
+/mute			:	Mute the sound of the video
+/unmute			:	Unmute the sound of the video (restore last known volume)
+/info			:	Toggle media info window
+/fx/<shader> <values> 	:	Apply the specified <shader> with given <values>
+/quit			:	Exit the program
 
 
 Credits
