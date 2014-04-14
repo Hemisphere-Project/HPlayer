@@ -31,16 +31,9 @@ HPlayer is based on
 - ofxOMXPlayer from jvcleave
 - ofxArgParser from satoruhiga
 
-1. Download / Install OpenFrameworks ARMv6 from http://openframeworks.cc/download/
-and unzip it somewhere like ~/openframeworks/ in the next steps, we'll call this path "$OF"
-> cd 
-> curl -O http://www.openframeworks.cc/versions/v0.8.1/of_v0.8.1_linuxarmv6l_release.tar.gz
-> mkdir openFrameworks
-> tar vxfz of_v0.8.1_linuxarmv6l_release.tar.gz -C openFrameworks --strip-components 1
-> rm of_v0.8.1_linuxarmv6l_release.tar.gz
-> cd ~/openFrameworks/scripts/linux/debian_armv6l
-> sudo ./install_dependencies.sh
-> make Release -C /home/pi/openFrameworks/libs/openFrameworksCompiled/project
+1. Download / Install OpenFrameworks ARMv6 
+somewhere like ~/openframeworks/ in the next steps, we'll call this path "$OF"
+Instructions: http://www.openframeworks.cc/setup/raspberrypi/
 
 2. Clone ofxOMXPlayer from https://github.com/jvcleave/ofxOMXPlayer into $OF/addons/
 > cd ~/openFrameworks/addons/ && git clone https://github.com/jvcleave/ofxOMXPlayer.git
@@ -81,14 +74,14 @@ HPlayer supports various command line arguments:
 Once started, HPlayer can be controlled with OSC commands over the network.
 The available commands are:
 
-/play [<file1>] [<file2>] ...	:	Play the file list in order (absolute or relative ~/video/ path)
+/play [<file1>] [<file2>] ...		:	Play the file list in order (absolute path)
 /playloop [<file1>] [<file2>] ...	:	Same as play with loop at the end
 /player			:	Rewind and play the last active file	
 /stop			:	Stop and rewind the current video file
 /pause			:	Pause the video file
 /resume			:	Resume the paused file
 /next			:	Play the next file in the list
-/volume <value> 	:	Set volume from 0.0 to 1.0 or from 0 to 100 (auto detect value format)
+/volume <value> 	:	Set volume from 0.0 to 1.0 or from 0 to 100
 /mute			:	Mute the sound of the video
 /unmute			:	Unmute the sound of the video (restore last known volume)
 /info			:	Toggle media info window
