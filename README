@@ -1,0 +1,85 @@
+
+ __  __  ____    ___                                     
+/\ \/\ \/\  _`\ /\_ \                                    
+\ \ \_\ \ \ \L\ \//\ \      __     __  __     __   _ __  
+ \ \  _  \ \ ,__/ \ \ \   /'__`\  /\ \/\ \  /'__`\/\`'__\
+  \ \ \ \ \ \ \/   \_\ \_/\ \L\.\_\ \ \_\ \/\  __/\ \ \/ 
+   \ \_\ \_\ \_\   /\____\ \__/.\_\\/`____ \ \____\\ \_\ 
+    \/_/\/_/\/_/   \/____/\/__/\/_/ `/___/> \/____/ \/_/ 
+                                       /\___/            
+                                       \/__/             
+                                       
+********** Hemisphere oscPlayer for Raspberry Pi ********** 
+
+
+What is it
+**********
+
+HPlayer is a video and sound player for RaspberryPi that can be controlled with OSC commands.
+The player is build on top of OMXPlayer with openGL Shaders and Textures support.
+HPlayer is developped under the terms of GNU General Public License version 2.
+You can find a copy of this license in the LICENSE file.
+
+
+Installation from source
+************************
+
+HPlayer is based on
+- OpenFrameworks 0.8.x ARMv6
+- ofxOsc (now embedded with OF-0.8)
+- ofxOMXPlayer from jvcleave
+- ofxArgParser from satoruhiga
+
+1. Download OpenFrameworks ARMv6 from http://openframeworks.cc/download/
+and unzip it somewhere like ~/openframeworks/ in the next steps, we'll call this path "$OF"
+
+2. Download ofxOMXPlayer from https://github.com/jvcleave/ofxOMXPlayer
+and unzip it into $OF/addons/ofxOMXPlayer/
+
+3. Download ofxArgParser from https://github.com/satoruhiga/ofxArgParser
+and unzip it into $OF/addons/ofxArgParser/
+
+4. Change directory to OF app folder and clone HPlayer repository:
+cd $OF/apps/myApps/
+git clone ssh://gitolite@airlab.fr:2237/HPlayer
+
+5. You are now ready to compile the player.
+If it's the first time you compile OF on your device, it can take quit a while !
+cd HPlayer
+make
+
+6. Once it's done, you can test it with "make run"
+or copy the content of the bin/ directory to your usual binary path.
+use ./HPlayer to start the player
+
+
+Use it!
+*******
+
+HPlayer supports various command line arguments:
+
+	--in <port> 		:	Input OSC Port 			(default=8000)
+	--out <port> 		:	Output OSC Port 		(default=8001)
+	--vpath <path>		:	Media folder path 	(default=~/video)
+	--mute			:	Disable sound			
+	--glsl			:	Enable Shaders support	
+	
+	
+	
+Once started, HPlayer can be controlled with OSC commands over the network.
+The available commands are:
+
+	/play [<file>]		:	Play the file if specified, or resume the current stopped or paused file.	 
+	/stop			:	Stop and rewind the current video file.
+	/pause			:	Pause the current video file.
+	/volume <value> 	:	Set volume from 0.0 to 1.0 or from 0 to 100 (auto detect value format)
+	/mute			:	Hide the video (black screen). The video does not automatically pause on mute.
+	/unmute			:	Show the video. The video does not automatically play on unmute.
+	/fx/<shader> <values> 	:	Apply the specified <shader> with given <values>
+	
+
+
+
+
+
+
