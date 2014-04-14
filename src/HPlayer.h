@@ -8,8 +8,6 @@
 #define OSCPORT_OUT	9001
 #define OSCHOST_OUT "localhost"
 
-#define NAME "/Denis"
-
 class HPlayer : public ofBaseApp
 {
 	public:
