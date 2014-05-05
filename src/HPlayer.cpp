@@ -1,5 +1,12 @@
+/* TODO
+play et playloop : support multiple files
+
+find how to jump to frame
+
+add termination handler
+*/
+
 #include "HPlayer.h"
-#include "ofxArgParser.h"
 
 //--------------------------------------------------------------
 void HPlayer::setup()
@@ -7,26 +14,27 @@ void HPlayer::setup()
 	//DEFAULT
 	playerName = "HPlayer";
 	defaultVolume = 50;
-	enableInfo = true;
+	enableInfo = false;
 	oscPortIN = OSCPORT_IN;
 	oscPortOUT = OSCPORT_OUT;
 	oscEnable = true;
-	glslEnable = false;
-	
-	
+	glslEnable = false;	
+	base64 = false;
 	
 	//COMMAND LINE ARGS PARSING
 	if (ofxArgParser::hasKey("name")) playerName = ofxArgParser::getValue("name");
 	if (ofxArgParser::hasKey("volume")) defaultVolume = ofToInt(ofxArgParser::getValue("volume"));
-	if (ofxArgParser::hasKey("info")) enableInfo = true;	
+	if (ofxArgParser::hasKey("info")) enableInfo = (ofToInt(ofxArgParser::getValue("info")) == 1);	
 	if (ofxArgParser::hasKey("in")) oscPortIN = ofToInt(ofxArgParser::getValue("in"));
 	if (ofxArgParser::hasKey("out")) oscPortOUT = ofToInt(ofxArgParser::getValue("out"));	
-	if (ofxArgParser::hasKey("noosc")) oscEnable = false;
-	if (ofxArgParser::hasKey("glsl")) glslEnable = true;
+	if (ofxArgParser::hasKey("osc")) oscEnable = (ofToInt(ofxArgParser::getValue("osc")) == 1);
+	if (ofxArgParser::hasKey("glsl")) glslEnable = (ofToInt(ofxArgParser::getValue("glsl")) == 1);
+	if (ofxArgParser::hasKey("base64")) base64 = (ofToInt(ofxArgParser::getValue("base64")) == 1);
 	
 	//SETUP OF
 	ofHideCursor();
 	ofBackground(0,0,0);
+	consoleListener.setup(this);
 		
 	//CONNECT OSC
 	Connected = false;	
@@ -35,9 +43,10 @@ void HPlayer::setup()
 	//INIT PLAYER
 	uxPlayer.init(glslEnable);
 	uxPlayer.volume(defaultVolume);
+	lastFrame = 0;
 	
-	//AUTOSTART PLAYER IF NO OSC
-	if (!oscEnable) uxPlayer.play();
+	//SEND STATUS
+	this->sendStatus();
 }
 
 //--------------------------------------------------------------
@@ -45,6 +54,27 @@ void HPlayer::update()
 {	
 	//EXECUTE RECEIVED OSC COMMANDS
 	this->execute();
+	//if (uxPlayer.isPlaying()) ofLog(OF_LOG_NOTICE,"-HP- frame: "+ofToString(uxPlayer.getCurrentFrame())+" "+ofToString(uxPlayer.getTotalNumFrames()));
+	
+	//DETECT END / LOOP since Listener in ofxOMX are broken
+	if (uxPlayer.isPlaying()) 
+	{
+		int maxFrame = uxPlayer.getTotalNumFrames()-1;
+		int currentFrame = uxPlayer.getCurrentFrame();
+		
+		if (uxPlayer.autoloop())
+			if (currentFrame < lastFrame) this->onVideoLoop();
+		
+		if (!uxPlayer.autoloop())
+			if ((currentFrame == maxFrame) and (lastFrame < maxFrame))
+			{
+				uxPlayer.stop();
+				this->onVideoEnd();
+			}
+		
+		lastFrame = currentFrame;
+	}
+	else lastFrame = 0;
 }
 
 //--------------------------------------------------------------
@@ -58,6 +88,44 @@ void HPlayer::draw(){
 	
 	//DEBUG INFO DISPLAY
 	if (enableInfo) this->displayInfo();
+}
+
+void HPlayer::onVideoEnd()
+{
+	ofLog(OF_LOG_NOTICE,"-HP- The Media did end");
+	if (!Connected) return;
+	
+	this->sendStatus();
+	
+	
+}
+
+void HPlayer::onVideoLoop()
+{
+	ofLog(OF_LOG_NOTICE,"-HP- The Media did loop");
+	if (!Connected) return;
+	
+	this->sendStatus();	
+}
+
+void HPlayer::onCharacterReceived(SSHKeyListenerEventData& e)
+{
+	keyPressed((int)e.character);
+}
+
+void HPlayer::keyPressed  (int key){
+	
+	ofLog(OF_LOG_NOTICE,"-HP- Key pressed: "+key);
+	
+	switch (key) 
+	{
+		case 'q':
+		{
+			uxPlayer.close();
+			std::exit(0);
+			break;
+		}
+	}
 }
 
 
@@ -89,10 +157,18 @@ void HPlayer::execute()
    		string command = address[1];
    		if (command == "*") command = address[2];
 		  	
-	  	if (command == "play")
+	  	if ((command == "play") or (command == "playloop"))
 		{			
-			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_STRING) && (m.getArgAsString(0) != "")) uxPlayer.play(m.getArgAsString(0));
-			else uxPlayer.play();
+			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_STRING) && (m.getArgAsString(0) != "")) 
+			{
+				bool doLoop = (command == "playloop");
+				
+				string filepath = m.getArgAsString(0);
+				if (base64) filepath = ofxCrypto::base64_decode(filepath);
+				
+				uxPlayer.play(filepath,doLoop);
+			}
+			else if (command == "play") uxPlayer.play();
 			
 		}
 		else if(command == "stop")
@@ -171,23 +247,28 @@ string HPlayer::oscToString(ofxOscMessage m) {
 
 void HPlayer::sendStatus() 
 {
+	if (!Connected) return;
+	
 	ofxOscMessage m;
 	m.setAddress("/status");
 	m.addStringArg(playerName);
+	
+	string filepath = uxPlayer.getFile();
+	if (base64) filepath = ofxCrypto::base64_encode(filepath);
 	
 	if (uxPlayer.isPlaying())
 	{
 		if (uxPlayer.isPaused()) m.addStringArg("paused");
 		else m.addStringArg("playing");
 		
-		m.addStringArg(uxPlayer.getFile());
+		m.addStringArg(filepath);
 		m.addIntArg(uxPlayer.getPositionMs());
 		m.addIntArg(uxPlayer.getDurationMs());
 	}
 	else 
 	{
 		m.addStringArg("stoped");
-		m.addStringArg(uxPlayer.getFile());
+		m.addStringArg(filepath);
 		m.addIntArg(0);
 		m.addIntArg(uxPlayer.getDurationMs());
 	}
@@ -222,7 +303,7 @@ void HPlayer::displayInfo() {
 	if (uxPlayer.isOpen)
 	{
 		info <<"\n" <<	"DIMENSIONS: 	"			<< uxPlayer.getWidth()<<"x"<<uxPlayer.getHeight();
-		info <<"\n" <<	"DURATION: 	"			<< uxPlayer.getDuration();
+		info <<"\n" <<	"POSITION / DURATION (): 	"				<< ofToString(uxPlayer.getPositionMs()/1000.) << " / " << ofToString(uxPlayer.getDurationMs()/1000.);	
 		info <<"\n" <<	"FRAMES: 	"				<< uxPlayer.getCurrentFrame() << " / " << uxPlayer.getTotalNumFrames();	
 	}
 	
@@ -235,8 +316,8 @@ void HPlayer::displayInfo() {
 void HPlayer::displayStandby() {
 
 	stringstream info;
-	info << " HPLAYER :: Hemisphere oscPlayer ";
-	ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::green);
+	info << " .:: HPLAYER ::. ";
+	ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);
 	
 }
 

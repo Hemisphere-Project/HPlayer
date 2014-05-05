@@ -25,11 +25,11 @@ void uxOMXPlayer::init(bool glsl)
 	//OMXPLAYER Settings
 	currentVolume = 0.5;
 	muteVolume = false;
-	settings.doFlipTexture		= false; //true on older firmware
-	settings.useHDMIForAudio 	= true;
-	settings.enableTexture 		= true;
-	settings.enableLooping 		= true;	
-	settings.videoPath 			= "";
+	this->settings.doFlipTexture		= false; //true on older firmware
+	this->settings.useHDMIForAudio 	= true;
+	this->settings.enableTexture 		= true;
+	this->settings.enableLooping 		= true;	
+	this->settings.videoPath 			= "";
 	
 	ofLog(OF_LOG_NOTICE,"-HP- omxPlayer initialized");
 }
@@ -68,7 +68,7 @@ void uxOMXPlayer::display(){
 
 //--------------------------------------------------------------
 void uxOMXPlayer::play(){
-	if (settings.videoPath != "") this->play(settings.videoPath);
+	if (this->settings.videoPath != "") this->play(this->settings.videoPath);
 	else this->play(currentIndex);
 }
 
@@ -82,6 +82,15 @@ void uxOMXPlayer::play(int index){
 	}
 }
 
+
+
+//--------------------------------------------------------------
+void uxOMXPlayer::play(string filepath, bool loop){
+
+	this->settings.enableLooping = loop;
+	this->play(filepath);
+}
+
 //--------------------------------------------------------------
 void uxOMXPlayer::play(string filepath){
 	
@@ -91,15 +100,17 @@ void uxOMXPlayer::play(string filepath){
 		ofLog(OF_LOG_NOTICE,"-HP- file not found: "+filepath);
 		return;
 	}
-	settings.videoPath = file.path();
+	
+	this->settings.videoPath = file.path();
 		
-	if (this->isOpen) this->loadMovie(settings.videoPath);
-	else this->setup(settings);
+	if (this->isOpen) this->stop(); //this->loadMovie(this->settings.videoPath);
+	//else 
+	this->setup(this->settings);
 		
 	this->volume();	
 	this->setPaused(false);
 	
-	ofLog(OF_LOG_NOTICE,"-HP- play "+settings.videoPath);
+	ofLog(OF_LOG_NOTICE,"-HP- play "+this->settings.videoPath);
 }
 
 //--------------------------------------------------------------
@@ -130,6 +141,11 @@ void uxOMXPlayer::resume(){
 	this->setPaused(false);
 	
 	ofLog(OF_LOG_NOTICE,"-HP- resume ");
+}
+
+//--------------------------------------------------------------
+bool uxOMXPlayer::autoloop(){
+	return this->settings.enableLooping;
 }
 
 
@@ -173,17 +189,17 @@ int uxOMXPlayer::getVolumeInt(){
 
 //--------------------------------------------------------------
 string uxOMXPlayer::getFile(){
-	return settings.videoPath;
+	return this->settings.videoPath;
 }
 
 //--------------------------------------------------------------
 int uxOMXPlayer::getPositionMs(){
-	return 0;
+	return static_cast<int>(this->getCurrentFrame() * this->getDurationMs() / this->getTotalNumFrames());
 }
 
 //--------------------------------------------------------------
 int uxOMXPlayer::getDurationMs(){
-	return 100;
+	return static_cast<int>(this->getDuration()*1000);
 }
 
 

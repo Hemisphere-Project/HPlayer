@@ -1,3 +1,4 @@
 ofxOMXPlayer
 ofxOsc
+ofxCrypto
 ofxArgParser

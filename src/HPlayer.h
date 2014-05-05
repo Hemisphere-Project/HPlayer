@@ -3,20 +3,32 @@
 #include "ofMain.h"
 #include "uxOMXPlayer.h"
 #include "ofxOsc.h"
+#include "ofxCrypto.h"
+#include "ofxArgParser.h"
+#include "ConsoleListener.h"
 
 #define OSCPORT_IN 	9000
 #define OSCPORT_OUT	9001
 #define OSCHOST_OUT "localhost"
 
-class HPlayer : public ofBaseApp
+class HPlayer : public ofBaseApp, public SSHKeyListener
 {
 	public:
 
 		void setup();
 		void update();
-		void draw();	
+		void draw();
+		
+		void keyPressed(int key);
+		
+		//SSH KEYPRESS RECEIVER
+		void 	onCharacterReceived(SSHKeyListenerEventData& e);
+		
 	
 	private:
+	
+		//SSH LISTENER
+		ConsoleListener consoleListener;
 	
 		//OSC RECEIVER
 		ofxOscReceiver  oscListener;
@@ -30,6 +42,7 @@ class HPlayer : public ofBaseApp
 		//OSC SENDER
 		ofxOscSender 	oscSender;
 		int 			oscPortOUT;
+		bool	base64;
 		void 	sendStatus();
 		void 	sendEnd(string file);
 		
@@ -38,12 +51,15 @@ class HPlayer : public ofBaseApp
 		void 	displayStandby();
 		
 		//PLAYER
+		void 	onVideoEnd();
+		void 	onVideoLoop();
 		uxOMXPlayer		uxPlayer;
 		bool 			glslEnable;
 		bool			enableInfo;	
 		string 			playerName;
 		int 			defaultVolume;
 		bool 			oscEnable;	
+		int 			lastFrame;
 		
 };
 

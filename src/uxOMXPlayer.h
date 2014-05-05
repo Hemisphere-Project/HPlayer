@@ -13,11 +13,14 @@ class uxOMXPlayer : public ofxOMXPlayer
 		
 		void play();
 		void play(int index);
+		void play(string filepath, bool loop);
 		void play(string file);
 		void next();
 		void pause();
 		void resume();
 		void stop();
+	
+		bool autoloop();
 		
 		void volume();
 		void volume(int v);
@@ -33,7 +36,7 @@ class uxOMXPlayer : public ofxOMXPlayer
 	
 	private:
 		ofxOMXPlayerSettings settings;	
-		
+	
 		vector<ofFile> 	videoFiles;
 		int				currentIndex;
 		

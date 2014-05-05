@@ -29,6 +29,7 @@ HPlayer is based on
 - OpenFrameworks 0.8.x ARMv6
 - ofxOsc (now embedded with OF-0.8)
 - ofxOMXPlayer from jvcleave
+- ofxCrypto from jkosoy 
 - ofxArgParser from satoruhiga
 
 
@@ -42,21 +43,24 @@ HPlayer is based on
 somewhere like ~/openframeworks/ in the next steps, we'll call this path "$OF"
 Instructions: http://www.openframeworks.cc/setup/raspberrypi/
 
-2. Clone ofxOMXPlayer from https://github.com/jvcleave/ofxOMXPlayer into $OF/addons/
+2a. Clone ofxOMXPlayer from https://github.com/jvcleave/ofxOMXPlayer into $OF/addons/
 > cd ~/openFrameworks/addons/ && git clone https://github.com/jvcleave/ofxOMXPlayer.git
 
-3. Clone ofxArgParser from https://github.com/satoruhiga/ofxArgParser into $OF/addons/
+2b. Clone ofxArgParser from https://github.com/satoruhiga/ofxArgParser into $OF/addons/
 > cd ~/openFrameworks/addons/ && git clone https://github.com/satoruhiga/ofxArgParser.git
 
-4. Clone project HPlayer into $OF/apps/myApps/
+2c. Clone ofxCrypto from https://github.com/jkosoy/ofxCrypto into $OF/addons/
+> cd ~/openFrameworks/addons/ && git clone https://github.com/jkosoy/ofxCrypto.git
+
+3. Clone project HPlayer into $OF/apps/myApps/
 > cd ~/openFrameworks/apps/myApps/ 
 > git clone https://github.com/Hemisphere-Project/HPlayer.git
 
-5. You are now ready to compile the player.
+4. You are now ready to compile the player.
 > cd ~/openFrameworks/apps/myApps/HPlayer
 > make
 
-6. Once it's done, you can test it with "make run"
+5. Once it's done, you can test it with "make run"
 or copy the content of the bin/ directory to your usual binary path.
 use ./HPlayer to start the player
 
@@ -74,8 +78,8 @@ HPlayer supports various command line arguments:
 	--volume <0:100>	:	Default volume		(default=50)
 	--in <port> 		:	Input OSC Port 			(default=9000)
 	--out <port> 		:	Output OSC Port  		(default=9001)
-	--noosc			:	Disable OSC connection		
-	--glsl			:	Enable Shaders support	
+	--osc <0:1>			:	OSC connection			(default=1)		
+	--glsl <0:1>		:	Enable Shaders support	(default=1)		
 	
 	
 Once started, HPlayer can be controlled with OSC commands over the network.
@@ -109,6 +113,7 @@ And we thank the hard work of
 ++ OpenFrameworks Developpers ++
 ++ OMXPlayer Developpers ++
 ++ jvcleave ++
+++ jkosoy ++
 ++ satoruhiga ++
 
 
