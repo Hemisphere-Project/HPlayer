@@ -39,14 +39,11 @@ void uxOMXPlayer::display(){
 	
 	if (!this->isPlaying()) return;
 	
-	//VIDEO SIZE (MAXIMIZE BUT KEEP ASPECT RATIO)
-	int width = floor( ofGetHeight() * this->getWidth() /  this->getHeight() );
-	if ( width >  ofGetWidth() ) width = ofGetWidth();
-	int height = floor( width * this->getHeight() /  this->getWidth() );  
-	
-	//VIDEO MARGINS
-	int marg_x = floor( (ofGetWidth() - width)/2 );
-	int marg_y = floor( (ofGetHeight() - height)/2 );
+	int width  = floor( ofGetHeight() * this->getWidth() / this -> getHeight() );
+	if (width > ofGetWidth()) width = ofGetWidth();
+	int height = floor( width * this -> getHeight() / this->getWidth() );
+	int marg_x = floor((ofGetWidth()-width)/2);
+	int marg_y = floor((ofGetHeight()-height)/2);
 	
 	//DRAW VIDEO
 	if (enableGLSL)
@@ -65,13 +62,13 @@ void uxOMXPlayer::display(){
 				shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
 	
 				//We then send our texture that kicks it off
-				this->draw(marg_x, marg_y, (ofGetWidth()-marg_x), (ofGetHeight()-marg_y));
+				this->draw(marg_x, marg_y, width, height);
 			shader.end();
 		fbo.end();
 		
 		fbo.draw(0, 0);
 	}
-	else this->draw(marg_x, marg_y, (ofGetWidth()-marg_x), (ofGetHeight()-marg_y));
+	else this->draw(marg_x, marg_y, width, height);
 }
 
 

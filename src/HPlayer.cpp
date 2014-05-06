@@ -210,21 +210,17 @@ void HPlayer::execute()
 		else if(command == "info")
 		{
 			enableInfo = !enableInfo;
-		}
-		else if	(command == "s")
-		{
-			//if (subcommand == "getStatus") sendStats = true;
-			//else sendStats = false;		
 		}			
 		else if(command == "quit")
 		{
+			ofLog(OF_LOG_NOTICE,"-HP- QUIT ");
 			uxPlayer.close();
 			std::exit(0);
 		}
 		
 		sendStats = true;
 		if (enableInfo) oscDebug += this->oscToString(m)+"\n";
-		if (enableInfo) ofLog(OF_LOG_NOTICE,"-HP- OSC Received: "+this->oscToString(m));
+		//if (enableInfo) ofLog(OF_LOG_NOTICE,"-HP- OSC Received: "+this->oscToString(m));
     }	
     
     if (sendStats) this->sendStatus();  
