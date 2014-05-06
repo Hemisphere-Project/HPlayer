@@ -26,7 +26,7 @@ void uxOMXPlayer::init(bool glsl)
 	currentVolume = 0.5;
 	muteVolume = false;
 	this->settings.doFlipTexture		= false; //true on older firmware
-	this->settings.useHDMIForAudio 	= true;
+	this->settings.useHDMIForAudio 		= true;
 	this->settings.enableTexture 		= true;
 	this->settings.enableLooping 		= true;	
 	this->settings.videoPath 			= "";

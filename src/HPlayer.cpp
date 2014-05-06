@@ -166,6 +166,8 @@ void HPlayer::execute()
 				string filepath = m.getArgAsString(0);
 				if (base64) filepath = ofxCrypto::base64_decode(filepath);
 				
+				ofLog(OF_LOG_NOTICE,"-HP- try to read: "+filepath);
+				
 				uxPlayer.play(filepath,doLoop);
 			}
 			else if (command == "play") uxPlayer.play();
