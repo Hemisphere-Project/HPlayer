@@ -16,6 +16,7 @@ void HPlayer::setup()
 	defaultVolume = 50;
 	audioHDMI = false,
 	enableInfo = false;
+	autoLoop = true;
 	oscPortIN = OSCPORT_IN;
 	oscPortOUT = OSCPORT_OUT;
 	oscEnable = true;
@@ -25,13 +26,15 @@ void HPlayer::setup()
 	//COMMAND LINE ARGS PARSING
 	if (ofxArgParser::hasKey("name")) playerName = ofxArgParser::getValue("name");
 	if (ofxArgParser::hasKey("volume")) defaultVolume = ofToInt(ofxArgParser::getValue("volume"));
-	if (ofxArgParser::hasKey("ahdmi")) audioHDMI = (ofToInt(ofxArgParser::getValue("ahdmi")) == 1);	
+	if (ofxArgParser::hasKey("ahdmi")) audioHDMI = (ofToInt(ofxArgParser::getValue("ahdmi")) == 1);
+	if (ofxArgParser::hasKey("loop")) autoLoop = (ofToInt(ofxArgParser::getValue("loop")) == 1);		
 	if (ofxArgParser::hasKey("info")) enableInfo = (ofToInt(ofxArgParser::getValue("info")) == 1);	
 	if (ofxArgParser::hasKey("in")) oscPortIN = ofToInt(ofxArgParser::getValue("in"));
 	if (ofxArgParser::hasKey("out")) oscPortOUT = ofToInt(ofxArgParser::getValue("out"));	
 	if (ofxArgParser::hasKey("osc")) oscEnable = (ofToInt(ofxArgParser::getValue("osc")) == 1);
 	if (ofxArgParser::hasKey("glsl")) glslEnable = (ofToInt(ofxArgParser::getValue("glsl")) == 1);
 	if (ofxArgParser::hasKey("base64")) base64 = (ofToInt(ofxArgParser::getValue("base64")) == 1);
+	
 	
 	//SETUP OF
 	ofHideCursor();
@@ -43,9 +46,17 @@ void HPlayer::setup()
 	if (oscEnable) this->connect();
 	
 	//INIT PLAYER
-	uxPlayer.init(audioHDMI, glslEnable);
+	uxPlayer.init(audioHDMI, autoLoop, glslEnable);
 	uxPlayer.volume(defaultVolume);
 	lastFrame = 0;
+	
+	//AUTOSTART WITH MEDIA PATH
+	if (ofxArgParser::hasKey("media")) 
+	{
+		vector<string> playlist;
+		playlist.push_back(ofxArgParser::getValue("media"));
+		uxPlayer.play( playlist, autoLoop);
+	}
 	
 	//SEND STATUS
 	this->sendStatus();
@@ -58,22 +69,30 @@ void HPlayer::update()
 	this->execute();
 	//if (uxPlayer.isPlaying()) ofLog(OF_LOG_NOTICE,"-HP- frame: "+ofToString(uxPlayer.getCurrentFrame())+" "+ofToString(uxPlayer.getTotalNumFrames()));
 	
+	//TODO BRING THAT IN THE uxOMX
 	//DETECT END / LOOP since Listener in ofxOMX are broken
 	if (uxPlayer.isPlaying()) 
 	{
 		int maxFrame = uxPlayer.getTotalNumFrames()-1;
 		int currentFrame = uxPlayer.getCurrentFrame();
-		
-		if (uxPlayer.autoloop())
-			if (currentFrame < lastFrame) this->onVideoLoop();
-		
-		if (!uxPlayer.autoloop())
-			if ((currentFrame == maxFrame) and (lastFrame < maxFrame))
-			{
-				uxPlayer.stop();
-				this->onVideoEnd();
-			}
-		
+
+		//TIME DID REWIND
+		if (currentFrame < lastFrame) 
+		{
+			ofLog(OF_LOG_NOTICE,"LOOP ::");
+			
+			this->sendStatus(); //TODO Create event statut change
+		}
+		//FILE REACH THE END
+		else if ((currentFrame == maxFrame) and (lastFrame < maxFrame)) 
+		{
+			ofLog(OF_LOG_NOTICE,"END ::");
+			
+			uxPlayer.next(); 
+			this->sendStatus(); //TODO Create event statut change
+		}		
+		 
+			
 		lastFrame = currentFrame;
 	}
 	else lastFrame = 0;
@@ -92,19 +111,6 @@ void HPlayer::draw(){
 	if (enableInfo) this->displayInfo();
 }
 
-void HPlayer::onVideoEnd()
-{
-	ofLog(OF_LOG_NOTICE,"-HP- The Media did end");
-	
-	this->sendStatus();
-}
-
-void HPlayer::onVideoLoop()
-{
-	ofLog(OF_LOG_NOTICE,"-HP- The Media did loop");
-	
-	this->sendStatus();	
-}
 
 void HPlayer::onCharacterReceived(SSHKeyListenerEventData& e)
 {
@@ -157,26 +163,21 @@ void HPlayer::execute()
 		  	
 	  	if ((command == "play") or (command == "playloop"))
 		{			
-			vector<ofFile> playlist;
-			ofFile file;
+			vector<string> playlist;
 			string filepath;
 			
 			bool doLoop = (command == "playloop");
 			
 			for(int k = 0; k < m.getNumArgs(); k++)
-			{
 				if ((m.getArgType(k) == OFXOSC_TYPE_STRING) && (m.getArgAsString(k) != "")) 
 				{
 					filepath = m.getArgAsString(k);
-					if (base64) filepath = ofxCrypto::base64_decode(filepath);
-					
-					file = ofFile::ofFile(filepath);
-					if (file.isFile()) playlist.push_back(file);
+					if (base64) filepath = ofxCrypto::base64_decode(filepath);	
+								
+					playlist.push_back(filepath);
 				}
-			}
 			
-			if (playlist.size() == 1) uxPlayer.play(playlist[0].path(),doLoop);
-			else if (playlist.size() > 1) uxPlayer.play(playlist,doLoop);			
+			uxPlayer.play( playlist, doLoop);				
 		}
 		else if(command == "stop")
 		{
@@ -193,7 +194,11 @@ void HPlayer::execute()
 		else if(command == "next")
 		{
 			uxPlayer.next();
-		}	
+		}
+		else if(command == "prev")
+		{
+			uxPlayer.prev();
+		}		
 		else if(command == "volume")
 		{
 			if (m.getArgType(0) == OFXOSC_TYPE_FLOAT) uxPlayer.volume(m.getArgAsFloat(0));
@@ -204,13 +209,24 @@ void HPlayer::execute()
 		else if(command == "mute")
 		{
 			bool doMute = true;
-			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_FLOAT)) doMute = (m.getArgAsFloat(0) == 1.0);
+			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_INT32)) doMute = (m.getArgAsInt32(0) == 1);
 		
 			uxPlayer.setMuted(doMute);
 		}
 		else if(command == "unmute")
 		{
 			uxPlayer.setMuted(false);
+		}
+		else if(command == "loop")
+		{
+			bool doLoop = true;
+			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_INT32)) doLoop = (m.getArgAsInt32(0) == 1);
+		
+			uxPlayer.setLoop(doLoop);
+		}
+		else if(command == "unloop")
+		{
+			uxPlayer.setLoop(false);
 		}
 		else if(command == "info")
 		{
@@ -267,6 +283,7 @@ void HPlayer::sendStatus()
 		m.addStringArg(filepath);
 		m.addIntArg(uxPlayer.getPositionMs());
 		m.addIntArg(uxPlayer.getDurationMs());
+		m.addIntArg( (uxPlayer.isLoop()) ? 1 : 0 );
 	}
 	else 
 	{
@@ -274,6 +291,7 @@ void HPlayer::sendStatus()
 		m.addStringArg(filepath);
 		m.addIntArg(0);
 		m.addIntArg(uxPlayer.getDurationMs());
+		m.addIntArg( (uxPlayer.isLoop()) ? 1 : 0 );
 	}
 	
 	m.addIntArg(uxPlayer.getVolumeInt());

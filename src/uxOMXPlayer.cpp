@@ -1,7 +1,7 @@
 #include "uxOMXPlayer.h"
 
 //--------------------------------------------------------------
-void uxOMXPlayer::init(bool audioHDMI, bool glsl)
+void uxOMXPlayer::init(bool audioHDMI, bool autoLoop, bool glsl)
 {			
 	//GLSL CONFIG 
 	enableGLSL = glsl;
@@ -9,7 +9,6 @@ void uxOMXPlayer::init(bool audioHDMI, bool glsl)
 	//SCAN VIDEO FOLDER
 	currentIndex = 0;
 	videoFiles.clear();
-	enableLoopingList = false;
 
 	//SHADER AND FRAME BUFFER LOAD
 	if (enableGLSL) 
@@ -23,9 +22,9 @@ void uxOMXPlayer::init(bool audioHDMI, bool glsl)
 	muteVolume = false;
 	this->settings.doFlipTexture		= false; //true on older firmware
 	this->settings.useHDMIForAudio 		= audioHDMI;
-	this->settings.enableTexture 		= true;
-	this->settings.enableLooping 		= false;	
+	this->settings.enableTexture 		= true;	
 	this->settings.videoPath 			= "";
+	this->setLoop(autoLoop);
 	
 	ofLog(OF_LOG_NOTICE,"-HP- omxPlayer initialized");
 }
@@ -41,7 +40,7 @@ void uxOMXPlayer::display(){
 	if (this->dim.width > ofGetWidth()) this->dim.width = ofGetWidth();
 	
 	//HEIGHT
-	if (this -> getWidth() > 0) this->dim.height = floor( width * this -> getHeight() / this->getWidth() );
+	if (this -> getWidth() > 0) this->dim.height = floor( this->dim.width * this -> getHeight() / this->getWidth() );
 	else this->dim.height = 0;
 	
 	//DRAW IF DIMS ARE VALID
@@ -83,50 +82,70 @@ void uxOMXPlayer::display(){
 	}
 }
 
-/*PLAYLIST*/
-
+/*PLAY FILE LIST*/
 //--------------------------------------------------------------
-void uxOMXPlayer::play(vector<ofFile> playlist, bool loop)
+void uxOMXPlayer::play(vector<string> playlist, bool doLoop)
 {
-
-	this->videoFiles = playlist;
-	this->enableLoopingList = loop;
-	this->play(0);
-}
-
-
-//--------------------------------------------------------------
-void uxOMXPlayer::play(int index){
-
-	if ((index >= 0) && (index < videoFiles.size())) 
-	{
-		currentIndex = index;
-		this->play(videoFiles[currentIndex].path(),false);
-	}
-}
-
-/*PLAY SINGLE FILE*/
-
-//--------------------------------------------------------------
-void uxOMXPlayer::play(string filepath, bool loop){
-
-	this->settings.enableLooping = loop;
-	this->play(filepath);
-}
-
-/*PLAY COMMON*/
-
-//--------------------------------------------------------------
-void uxOMXPlayer::play(string filepath){
+	vector<ofFile> list;
 	
-	ofFile file(filepath);	
-	if (!file.isFile()) 
+	for(int k = 0; k < playlist.size(); k++)
+	{			
+		ofLog(OF_LOG_NOTICE,"-HP- add  "+playlist[k]+" to the playlist");
+		ofFile file(playlist[k]);
+		if (file.isFile()) list.push_back(file);
+		else if (file.isDirectory())
+		{
+			ofDirectory dir(playlist[k]);
+			dir.listDir();
+			for(int j = 0; j < dir.size(); j++)
+				if (dir.getFile(j).isFile()) list.push_back(dir.getFile(j));
+		}
+	}
+	
+	for(int k = 0; k < list.size(); k++)
+		ofLog(OF_LOG_NOTICE,"-HP- "+list[k].path()+" in the playlist");
+	
+	this->videoFiles = list;
+	
+	//NO FILES IN THE LIST: DO NOTHING
+	if (list.size() == 0) 
 	{
-		ofLog(OF_LOG_NOTICE,"-HP- file not found: "+filepath);
+		this->stop();
 		return;
 	}
 	
-	this->settings.videoPath = file.path();
+	this->setLoop(doLoop);
+	
+	//START PLAY AT 0
+	this->play(0);
+}
+
+/*PLAY FILE*/
+//--------------------------------------------------------------
+void uxOMXPlayer::play(string file, bool doLoop)
+{
+	vector<string> playlist;
+	playlist.push_back(file);
+	this->play(playlist,doLoop);
+}
+
+/*PLAY FILE AT INDEX IN THE LIST*/
+//--------------------------------------------------------------
+void uxOMXPlayer::play(int index){
+	
+	if ((index >= 0) && (index < videoFiles.size())) 
+	{
+		currentIndex = index;		
+		this->settings.videoPath = videoFiles[currentIndex].path();
+		
+		if (this->isPlaying()) this->loadMovie(this->settings.videoPath);
+		else this->play();
+	}
+}
+
+/*PLAY FILE WITH SPECIFIED SETTINGS*/
+//--------------------------------------------------------------
+void uxOMXPlayer::play(){
 		
 	if (this->isOpen) this->stop(); 
 	this->setup(this->settings);
@@ -134,15 +153,48 @@ void uxOMXPlayer::play(string filepath){
 	this->volume();	
 	this->setPaused(false);
 	
-	ofLog(OF_LOG_NOTICE,"-HP- play "+this->settings.videoPath);
+	ofLog(OF_LOG_NOTICE,"-HP- playing "+this->settings.videoPath);
 }
 
+/*PLAY NEXT FILE IN THE LIST*/
 //--------------------------------------------------------------
-void uxOMXPlayer::next(){
-
+void uxOMXPlayer::next()
+{
+	//if only one file
+	if (this->playlistSize() == 1)
+	{
+		if (!this->isLoop()) this->stop();
+		return;
+	}
+	
+	//playlist
 	int index = currentIndex+1;
-	if (index >= videoFiles.size()) index = 0;
-	this->play(index);
+	if (index >= videoFiles.size()) 
+	{
+		if (this->isLoop()) this->play(0);
+		else this->stop();
+	}
+	else this->play(index);
+}
+
+/*PLAY PREVIOUS FILE IN THE LIST*/
+//--------------------------------------------------------------
+void uxOMXPlayer::prev()
+{
+	//if only one file
+	if (this->playlistSize() == 1)
+	{
+		if (!this->isLoop()) this->stop();
+		return;
+	}
+	
+	int index = currentIndex-1;
+	if (index < 0) 
+	{
+		if (this->isLoop()) this->play((videoFiles.size()-1));
+		else this->stop();
+	}
+	else this->play(index);
 }
 
 //--------------------------------------------------------------
@@ -169,9 +221,28 @@ void uxOMXPlayer::resume(){
 }
 
 //--------------------------------------------------------------
-bool uxOMXPlayer::autoloop(){
-	return this->settings.enableLooping;
-	//TODO GERER LE LOOPING SELON LIST OU PAS (attention le onVideoLoop dépend de ça!!)
+void uxOMXPlayer::setLoop(bool doLoop){
+	
+	this->enableLoopingList = false;
+	this->settings.enableLooping = false;
+	
+	//ONLY ONE FILE IN THE LIST
+	if (videoFiles.size() == 1)
+	{
+		if (this->settings.enableLooping != doLoop)
+		{
+			this->settings.enableLooping = doLoop;
+			if (this->isPlaying()) this->play();
+		}
+	}
+	
+	//NONE OR MULTIPLE FILES PLAYLIST
+	else this->enableLoopingList = doLoop;	
+}
+
+//--------------------------------------------------------------
+bool uxOMXPlayer::isLoop(){
+	return (this->settings.enableLooping || this->enableLoopingList);
 }
 
 
@@ -206,6 +277,11 @@ bool uxOMXPlayer::isMuted(){
 void uxOMXPlayer::setMuted(bool mute){
 	muteVolume = mute;
 	this->volume();
+}
+
+//--------------------------------------------------------------
+int uxOMXPlayer::playlistSize(){
+	return videoFiles.size();
 }
 
 //--------------------------------------------------------------

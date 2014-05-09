@@ -51,9 +51,8 @@ class HPlayer : public ofBaseApp, public SSHKeyListener
 		void 	displayStandby();
 		
 		//PLAYER
-		void 	onVideoEnd();
-		void 	onVideoLoop();
 		uxOMXPlayer		uxPlayer;
+		bool 			autoLoop;
 		bool 			glslEnable;
 		bool			enableInfo;	
 		bool			audioHDMI;	
