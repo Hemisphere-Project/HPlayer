@@ -1,19 +1,15 @@
 #include "uxOMXPlayer.h"
 
 //--------------------------------------------------------------
-void uxOMXPlayer::init(bool glsl)
+void uxOMXPlayer::init(bool audioHDMI, bool glsl)
 {			
 	//GLSL CONFIG 
 	enableGLSL = glsl;
 	
 	//SCAN VIDEO FOLDER
 	currentIndex = 0;
-	ofDirectory currentVideoDirectory(ofToDataPath(VIDEO_DIR, true));
-	if (currentVideoDirectory.exists()) 
-	{
-		currentVideoDirectory.listDir();
-		videoFiles = currentVideoDirectory.getFiles();
-	}
+	videoFiles.clear();
+	enableLoopingList = false;
 
 	//SHADER AND FRAME BUFFER LOAD
 	if (enableGLSL) 
@@ -26,9 +22,9 @@ void uxOMXPlayer::init(bool glsl)
 	currentVolume = 0.5;
 	muteVolume = false;
 	this->settings.doFlipTexture		= false; //true on older firmware
-	this->settings.useHDMIForAudio 		= true;
+	this->settings.useHDMIForAudio 		= audioHDMI;
 	this->settings.enableTexture 		= true;
-	this->settings.enableLooping 		= true;	
+	this->settings.enableLooping 		= false;	
 	this->settings.videoPath 			= "";
 	
 	ofLog(OF_LOG_NOTICE,"-HP- omxPlayer initialized");
@@ -39,44 +35,65 @@ void uxOMXPlayer::display(){
 	
 	if (!this->isPlaying()) return;
 	
-	int width  = floor( ofGetHeight() * this->getWidth() / this -> getHeight() );
-	if (width > ofGetWidth()) width = ofGetWidth();
-	int height = floor( width * this -> getHeight() / this->getWidth() );
-	int marg_x = floor((ofGetWidth()-width)/2);
-	int marg_y = floor((ofGetHeight()-height)/2);
+	//WIDTH
+	if (this -> getHeight() > 0) this->dim.width = floor( ofGetHeight() * this->getWidth() / this -> getHeight() );
+	else this->dim.width = 0;
+	if (this->dim.width > ofGetWidth()) this->dim.width = ofGetWidth();
 	
-	//DRAW VIDEO
-	if (enableGLSL)
+	//HEIGHT
+	if (this -> getWidth() > 0) this->dim.height = floor( width * this -> getHeight() / this->getWidth() );
+	else this->dim.height = 0;
+	
+	//DRAW IF DIMS ARE VALID
+	if ((this->dim.width > 0) && (this->dim.height > 0))
 	{
-		fbo.begin();
-			shader.begin();
-				//Here we tell pass our shader some changing values
-			
-				//We pass our texture id 
-				shader.setUniformTexture("tex0", this->getTextureReference(), this->getTextureID());
-			
-				//We give it an incrementing value to use
-				shader.setUniform1f("time", ofGetElapsedTimef());
-			
-				//And a resolution
-				shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+		//MARGINS
+		this->dim.marginX = floor((ofGetWidth()-this->dim.width)/2);
+		this->dim.marginY = floor((ofGetHeight()-this->dim.height)/2);
 	
-				//We then send our texture that kicks it off
-				this->draw(marg_x, marg_y, width, height);
-			shader.end();
-		fbo.end();
+		//DRAW VIDEO
+		if (enableGLSL)
+		{
+			fbo.begin();
+				shader.begin();
+					//Here we tell pass our shader some changing values
+			
+					//We pass our texture id 
+					shader.setUniformTexture("tex0", this->getTextureReference(), this->getTextureID());
+			
+					//We give it an incrementing value to use
+					shader.setUniform1f("time", ofGetElapsedTimef());
+			
+					//And a resolution
+					shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+	
+					//We then send our texture that kicks it off
+					this->draw(this->dim.marginX, this->dim.marginY, this->dim.width, this->dim.height);
+				shader.end();
+			fbo.end();
 		
-		fbo.draw(0, 0);
+			fbo.draw(0, 0);
+		}
+		else this->draw(this->dim.marginX, this->dim.marginY, this->dim.width, this->dim.height);
 	}
-	else this->draw(marg_x, marg_y, width, height);
+	else 
+	{
+		this->dim.marginX = 0;
+		this->dim.marginY = 0;
+	}
 }
 
+/*PLAYLIST*/
 
 //--------------------------------------------------------------
-void uxOMXPlayer::play(){
-	if (this->settings.videoPath != "") this->play(this->settings.videoPath);
-	else this->play(currentIndex);
+void uxOMXPlayer::play(vector<ofFile> playlist, bool loop)
+{
+
+	this->videoFiles = playlist;
+	this->enableLoopingList = loop;
+	this->play(0);
 }
+
 
 //--------------------------------------------------------------
 void uxOMXPlayer::play(int index){
@@ -84,11 +101,11 @@ void uxOMXPlayer::play(int index){
 	if ((index >= 0) && (index < videoFiles.size())) 
 	{
 		currentIndex = index;
-		this->play(videoFiles[currentIndex].path());
+		this->play(videoFiles[currentIndex].path(),false);
 	}
 }
 
-
+/*PLAY SINGLE FILE*/
 
 //--------------------------------------------------------------
 void uxOMXPlayer::play(string filepath, bool loop){
@@ -96,6 +113,8 @@ void uxOMXPlayer::play(string filepath, bool loop){
 	this->settings.enableLooping = loop;
 	this->play(filepath);
 }
+
+/*PLAY COMMON*/
 
 //--------------------------------------------------------------
 void uxOMXPlayer::play(string filepath){
@@ -109,8 +128,7 @@ void uxOMXPlayer::play(string filepath){
 	
 	this->settings.videoPath = file.path();
 		
-	if (this->isOpen) this->stop(); //this->loadMovie(this->settings.videoPath);
-	//else 
+	if (this->isOpen) this->stop(); 
 	this->setup(this->settings);
 		
 	this->volume();	
@@ -129,6 +147,7 @@ void uxOMXPlayer::next(){
 
 //--------------------------------------------------------------
 void uxOMXPlayer::stop(){
+	
 	this->close();
 	this->getTextureReference().clear();
 	
@@ -152,6 +171,7 @@ void uxOMXPlayer::resume(){
 //--------------------------------------------------------------
 bool uxOMXPlayer::autoloop(){
 	return this->settings.enableLooping;
+	//TODO GERER LE LOOPING SELON LIST OU PAS (attention le onVideoLoop dépend de ça!!)
 }
 
 

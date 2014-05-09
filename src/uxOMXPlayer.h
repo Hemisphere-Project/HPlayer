@@ -2,19 +2,29 @@
 
 #include "ofxOMXPlayer.h"
 
-#define VIDEO_DIR 	"video"
+#define VIDEO_DIR 	""
+
+struct dims_t {
+  int height;
+  int width;
+  int marginX;
+  int marginY
+};
 
 class uxOMXPlayer : public ofxOMXPlayer
 {
 	public:
 
-		void init(bool glsl);
+		void init(bool audioHDMI, bool glsl);
 		void display();	
 		
-		void play();
+		void play(vector<ofFile> playlist, bool loop);
 		void play(int index);
+		
 		void play(string filepath, bool loop);
+		
 		void play(string file);
+		
 		void next();
 		void pause();
 		void resume();
@@ -36,10 +46,12 @@ class uxOMXPlayer : public ofxOMXPlayer
 	
 	private:
 		ofxOMXPlayerSettings settings;	
+		dims_t	dim;
 	
 		vector<ofFile> 	videoFiles;
 		int				currentIndex;
-		
+		bool			enableLoopingList;
+					
 		float 		currentVolume;
 		bool 		muteVolume;
 		

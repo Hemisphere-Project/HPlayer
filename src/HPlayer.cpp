@@ -14,6 +14,7 @@ void HPlayer::setup()
 	//DEFAULT
 	playerName = "HPlayer";
 	defaultVolume = 50;
+	audioHDMI = false,
 	enableInfo = false;
 	oscPortIN = OSCPORT_IN;
 	oscPortOUT = OSCPORT_OUT;
@@ -24,6 +25,7 @@ void HPlayer::setup()
 	//COMMAND LINE ARGS PARSING
 	if (ofxArgParser::hasKey("name")) playerName = ofxArgParser::getValue("name");
 	if (ofxArgParser::hasKey("volume")) defaultVolume = ofToInt(ofxArgParser::getValue("volume"));
+	if (ofxArgParser::hasKey("ahdmi")) audioHDMI = (ofToInt(ofxArgParser::getValue("ahdmi")) == 1);	
 	if (ofxArgParser::hasKey("info")) enableInfo = (ofToInt(ofxArgParser::getValue("info")) == 1);	
 	if (ofxArgParser::hasKey("in")) oscPortIN = ofToInt(ofxArgParser::getValue("in"));
 	if (ofxArgParser::hasKey("out")) oscPortOUT = ofToInt(ofxArgParser::getValue("out"));	
@@ -41,7 +43,7 @@ void HPlayer::setup()
 	if (oscEnable) this->connect();
 	
 	//INIT PLAYER
-	uxPlayer.init(glslEnable);
+	uxPlayer.init(audioHDMI, glslEnable);
 	uxPlayer.volume(defaultVolume);
 	lastFrame = 0;
 	
@@ -93,17 +95,13 @@ void HPlayer::draw(){
 void HPlayer::onVideoEnd()
 {
 	ofLog(OF_LOG_NOTICE,"-HP- The Media did end");
-	if (!Connected) return;
 	
 	this->sendStatus();
-	
-	
 }
 
 void HPlayer::onVideoLoop()
 {
 	ofLog(OF_LOG_NOTICE,"-HP- The Media did loop");
-	if (!Connected) return;
 	
 	this->sendStatus();	
 }
@@ -159,19 +157,26 @@ void HPlayer::execute()
 		  	
 	  	if ((command == "play") or (command == "playloop"))
 		{			
-			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_STRING) && (m.getArgAsString(0) != "")) 
-			{
-				bool doLoop = (command == "playloop");
-				
-				string filepath = m.getArgAsString(0);
-				if (base64) filepath = ofxCrypto::base64_decode(filepath);
-				
-				ofLog(OF_LOG_NOTICE,"-HP- try to read: "+filepath);
-				
-				uxPlayer.play(filepath,doLoop);
-			}
-			else if (command == "play") uxPlayer.play();
+			vector<ofFile> playlist;
+			ofFile file;
+			string filepath;
 			
+			bool doLoop = (command == "playloop");
+			
+			for(int k = 0; k < m.getNumArgs(); k++)
+			{
+				if ((m.getArgType(k) == OFXOSC_TYPE_STRING) && (m.getArgAsString(k) != "")) 
+				{
+					filepath = m.getArgAsString(k);
+					if (base64) filepath = ofxCrypto::base64_decode(filepath);
+					
+					file = ofFile::ofFile(filepath);
+					if (file.isFile()) playlist.push_back(file);
+				}
+			}
+			
+			if (playlist.size() == 1) uxPlayer.play(playlist[0].path(),doLoop);
+			else if (playlist.size() > 1) uxPlayer.play(playlist,doLoop);			
 		}
 		else if(command == "stop")
 		{

@@ -56,6 +56,7 @@ class HPlayer : public ofBaseApp, public SSHKeyListener
 		uxOMXPlayer		uxPlayer;
 		bool 			glslEnable;
 		bool			enableInfo;	
+		bool			audioHDMI;	
 		string 			playerName;
 		int 			defaultVolume;
 		bool 			oscEnable;	
