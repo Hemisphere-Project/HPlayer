@@ -137,9 +137,7 @@ void uxOMXPlayer::play(int index){
 	{
 		currentIndex = index;		
 		this->settings.videoPath = videoFiles[currentIndex].path();
-		
-		if (this->isPlaying()) this->loadMovie(this->settings.videoPath);
-		else this->play();
+		this->play();
 	}
 }
 
@@ -295,8 +293,13 @@ string uxOMXPlayer::getFile(){
 }
 
 //--------------------------------------------------------------
+int uxOMXPlayer::getCurrentFrameNbr(){
+	return (this->getCurrentFrame() % this->getTotalNumFrames());
+}
+
+//--------------------------------------------------------------
 int uxOMXPlayer::getPositionMs(){
-	return static_cast<int>(this->getCurrentFrame() * this->getDurationMs() / this->getTotalNumFrames());
+	return static_cast<int>(this->getCurrentFrameNbr() * this->getDurationMs() / this->getTotalNumFrames());
 }
 
 //--------------------------------------------------------------

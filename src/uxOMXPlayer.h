@@ -40,6 +40,7 @@ class uxOMXPlayer : public ofxOMXPlayer
 		string 	getFile();
 		int		playlistSize();
 		int  	getVolumeInt();
+		int 	getCurrentFrameNbr();
 		int 	getPositionMs();
 		int 	getDurationMs();
 		bool 	isMuted();		

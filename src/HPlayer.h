@@ -60,6 +60,7 @@ class HPlayer : public ofBaseApp, public SSHKeyListener
 		int 			defaultVolume;
 		bool 			oscEnable;	
 		int 			lastFrame;
+		int				freeze;
 		
 };
 

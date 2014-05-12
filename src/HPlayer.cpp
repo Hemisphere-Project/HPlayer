@@ -49,6 +49,8 @@ void HPlayer::setup()
 	uxPlayer.init(audioHDMI, autoLoop, glslEnable);
 	uxPlayer.volume(defaultVolume);
 	lastFrame = 0;
+	freeze = 0;
+	
 	
 	//AUTOSTART WITH MEDIA PATH
 	if (ofxArgParser::hasKey("media")) 
@@ -67,31 +69,29 @@ void HPlayer::update()
 {	
 	//EXECUTE RECEIVED OSC COMMANDS
 	this->execute();
-	//if (uxPlayer.isPlaying()) ofLog(OF_LOG_NOTICE,"-HP- frame: "+ofToString(uxPlayer.getCurrentFrame())+" "+ofToString(uxPlayer.getTotalNumFrames()));
+	//if (uxPlayer.isPlaying()) ofLog(OF_LOG_NOTICE,"-HP- frame: "+ofToString(uxPlayer.getCurrentFrameNbr())+" "+ofToString(uxPlayer.getTotalNumFrames()));
 	
 	//TODO BRING THAT IN THE uxOMX
 	//DETECT END / LOOP since Listener in ofxOMX are broken
 	if (uxPlayer.isPlaying()) 
 	{
 		int maxFrame = uxPlayer.getTotalNumFrames()-1;
-		int currentFrame = uxPlayer.getCurrentFrame();
-
-		//TIME DID REWIND
-		if (currentFrame < lastFrame) 
-		{
-			ofLog(OF_LOG_NOTICE,"LOOP ::");
-			
-			this->sendStatus(); //TODO Create event statut change
-		}
+		int currentFrame = uxPlayer.getCurrentFrameNbr();
+		
 		//FILE REACH THE END
-		else if ((currentFrame == maxFrame) and (lastFrame < maxFrame)) 
-		{
-			ofLog(OF_LOG_NOTICE,"END ::");
-			
+		if ((currentFrame == maxFrame) and (lastFrame < maxFrame)) 
+		{			
 			uxPlayer.next(); 
 			this->sendStatus(); //TODO Create event statut change
 		}		
-		 
+		
+		//FREEZE detection (due to wrong frame counter)
+		if (currentFrame == lastFrame) 
+		{
+			freeze++;
+			if (freeze > 10) uxPlayer.next();
+		}
+		else freeze = 0;
 			
 		lastFrame = currentFrame;
 	}
@@ -325,7 +325,7 @@ void HPlayer::displayInfo() {
 	{
 		info <<"\n" <<	"DIMENSIONS: 	"			<< uxPlayer.getWidth()<<"x"<<uxPlayer.getHeight();
 		info <<"\n" <<	"POSITION / DURATION (): 	"				<< ofToString(uxPlayer.getPositionMs()/1000.) << " / " << ofToString(uxPlayer.getDurationMs()/1000.);	
-		info <<"\n" <<	"FRAMES: 	"				<< uxPlayer.getCurrentFrame() << " / " << uxPlayer.getTotalNumFrames();	
+		info <<"\n" <<	"FRAMES: 	"				<< uxPlayer.getCurrentFrameNbr() << " / " << uxPlayer.getTotalNumFrames();	
 	}
 	
 	info <<"\n" <<	"OSC [IN "<<oscPortIN<<"] [OUT "<<oscPortOUT<<"]: 		"	<< oscDebug;
