@@ -59,7 +59,7 @@ void uxOMXPlayer::display(){
 	this->dim.marginY = floor((ofGetHeight()-this->dim.height)/2);
 	
 	//DRAW VIDEO
-	if (this->.isFrameNew())
+	if (this->isFrameNew())
 	{
 		fbo.begin();
 			ofClear(0, 0, 0, 0);
