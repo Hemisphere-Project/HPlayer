@@ -10,12 +10,14 @@ void uxOMXPlayer::init(bool audioHDMI, bool autoLoop, bool glsl)
 	currentIndex = 0;
 	videoFiles.clear();
 
-	//SHADER AND FRAME BUFFER LOAD
-	if (enableGLSL) 
-	{
-		shader.load("shader/shaderExample");
-		fbo.allocate(ofGetWidth(), ofGetHeight());
-	}
+	//FRAME BUFFER
+	fbo.allocate(ofGetWidth(), ofGetHeight());
+	fbo.begin();
+		ofClear(0, 0, 0, 0);
+	fbo.end();
+
+	//SHADER LOAD
+	if (enableGLSL)  shader.load("shader/shaderExample");
 	
 	//OMXPLAYER Settings
 	currentVolume = 0.5;
@@ -26,6 +28,15 @@ void uxOMXPlayer::init(bool audioHDMI, bool autoLoop, bool glsl)
 	this->settings.videoPath 			= "";
 	this->setLoop(autoLoop);
 	
+	//DIMENSIONS IN NON TEXTURED MODE
+	if (!this->settings.enableTexture) 
+	{
+		this->settings.displayRect.width = 400;
+		this->settings.displayRect.height = 300;
+		this->settings.displayRect.x = 440;
+		this->settings.displayRect.y = 200;
+	}
+	
 	ofLog(OF_LOG_NOTICE,"-HP- omxPlayer initialized");
 }
 
@@ -33,53 +44,47 @@ void uxOMXPlayer::init(bool audioHDMI, bool autoLoop, bool glsl)
 void uxOMXPlayer::display(){
 	
 	if (!this->isPlaying()) return;
+	if (!this->isTextureEnabled) return;
+	if (!((this -> getHeight() > 0) and (this -> getWidth() > 0))) return;
 	
 	//WIDTH
-	if (this -> getHeight() > 0) this->dim.width = floor( ofGetHeight() * this->getWidth() / this -> getHeight() );
-	else this->dim.width = 0;
+	this->dim.width = floor( ofGetHeight() * this->getWidth() / this -> getHeight() );
 	if (this->dim.width > ofGetWidth()) this->dim.width = ofGetWidth();
 	
 	//HEIGHT
-	if (this -> getWidth() > 0) this->dim.height = floor( this->dim.width * this -> getHeight() / this->getWidth() );
-	else this->dim.height = 0;
+	this->dim.height = floor( this->dim.width * this -> getHeight() / this->getWidth() );
 	
-	//DRAW IF DIMS ARE VALID
-	if ((this->dim.width > 0) && (this->dim.height > 0))
+	//MARGINS
+	this->dim.marginX = floor((ofGetWidth()-this->dim.width)/2);
+	this->dim.marginY = floor((ofGetHeight()-this->dim.height)/2);
+	
+	//DRAW VIDEO
+	if (this->.isFrameNew())
 	{
-		//MARGINS
-		this->dim.marginX = floor((ofGetWidth()-this->dim.width)/2);
-		this->dim.marginY = floor((ofGetHeight()-this->dim.height)/2);
-	
-		//DRAW VIDEO
-		if (enableGLSL)
-		{
-			fbo.begin();
-				shader.begin();
-					//Here we tell pass our shader some changing values
+		fbo.begin();
+			ofClear(0, 0, 0, 0);
 			
-					//We pass our texture id 
-					shader.setUniformTexture("tex0", this->getTextureReference(), this->getTextureID());
-			
-					//We give it an incrementing value to use
-					shader.setUniform1f("time", ofGetElapsedTimef());
-			
-					//And a resolution
-					shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
-	
-					//We then send our texture that kicks it off
-					this->draw(this->dim.marginX, this->dim.marginY, this->dim.width, this->dim.height);
-				shader.end();
-			fbo.end();
+			if (enableGLSL) shader.begin();
+				//Here we tell pass our shader some changing values
 		
-			fbo.draw(0, 0);
-		}
-		else this->draw(this->dim.marginX, this->dim.marginY, this->dim.width, this->dim.height);
+				//We pass our texture id 
+				if (enableGLSL) shader.setUniformTexture("tex0", this->getTextureReference(), this->getTextureID());
+		
+				//We give it an incrementing value to use
+				if (enableGLSL) shader.setUniform1f("time", ofGetElapsedTimef());
+		
+				//And a resolution
+				if (enableGLSL) shader.setUniform2f("resolution", ofGetWidth(), ofGetHeight());
+
+				//We then send our texture that kicks it off
+				this->draw(this->dim.marginX, this->dim.marginY, this->dim.width, this->dim.height);
+				
+			if (enableGLSL) shader.end();
+			
+		fbo.end();
 	}
-	else 
-	{
-		this->dim.marginX = 0;
-		this->dim.marginY = 0;
-	}
+	
+	fbo.draw(0, 0);
 }
 
 /*PLAY FILE LIST*/
