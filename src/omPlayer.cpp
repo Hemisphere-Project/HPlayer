@@ -1,53 +1,70 @@
 #include "omPlayer.h"
 
 //--------------------------------------------------------------
-void omPlayer::init()
-{
-	currentVolume = 0.5;
-	muteVolume = false;
-	
+void omPlayer::init(bool audioHDMI)
+{	
 	//OMXPLAYER Settings
 	settings.videoPath 			= "";
-	//settings.videoPath = ofToDataPath("/home/pi/media/cut.mov", true);
 	settings.useHDMIForAudio 	= audioHDMI;	
 	settings.doFlipTexture		= false; //true on older firmware
 	settings.enableTexture 		= true;	
+	settings.initialVolume		= 0.5;
 	
+	//params DEFAULTS
+	params.name = "Raymond";
+	params.volume = settings.initialVolume;
+	params.mute = false;
+	params.blur = 0;
+	params.zoom = 100;
 
-	fx.blur = 2;
-
+	//SHADERS
 	noshader.load("NoShader");
 	blurV.load("VerticalBlur");
 	blurH.load("HorizontalBlur");
 	
+	//FRAMEBUFFERS
 	framebuffer.allocate(ofGetWidth(), ofGetHeight());
 	frameblur.allocate(ofGetWidth(), ofGetHeight());
+	this->clearscreen();
 
+	//START PLAYER
 	this->setup(settings);	
 }
 
 void omPlayer::buffer()
 {	
-	if (!this->isFrameNew()) return;
-	if (!this->isTextureEnabled) return;
-	
-	framebuffer.begin();
-		ofClear(0,0,0,0);
-	framebuffer.end();
-	
+	//IF NOT PLAYING // DO NOTHING
 	if (!this->isPlaying()) return;
+
+	//APPLY VOLUME CHANGES
+	this->applyVolume();
+	
+	//IF NO VIDEO FLUX // DO NOTHING
+	if (!this->isTextureEnabled) return;
 	if (!((this->getHeight() > 0) and (this->getWidth() > 0))) return;
 	
 	//WIDTH
-	dim.width = floor( ofGetHeight() * this->getWidth() / this->getHeight() );
-	if (dim.width > ofGetWidth()) dim.width = ofGetWidth();
+	dim.width = floor( ofGetHeight() * this->getWidth() / this->getHeight() ); //WIDTH RATIO FROM MAXIMIZED HEIGHT
+	if (dim.width > ofGetWidth()) dim.width = ofGetWidth(); //SHRINK IF WIDTH IS TO BIG
 	
-	//HEIGHT
-	dim.height = floor( dim.width * this->getHeight() / this->getWidth() );
+	//ZOOM
+	if (params.zoom != 100)
+	{
+		dim.width = floor( dim.width * params.zoom / 100. ); //APPLY ZOOM
+		if (dim.width > ofGetWidth()) dim.width = ofGetWidth(); //SHRINK IF WIDTH IS TO BIG
+	}
+	if (!(dim.width > 0)) return;
+	
+	//HEIGHT 
+	dim.height = floor( dim.width * this->getHeight() / this->getWidth() ); //KEEP ASPECT RATIO
+	if (!(dim.height > 0)) return;
 	
 	//MARGINS
 	dim.marginX = floor((ofGetWidth()-dim.width)/2);
 	dim.marginY = floor((ofGetHeight()-dim.height)/2);
+	
+	//CLEAR BUFFER
+	this->clearscreen();
 	
 	//RENDER TO FRAMEBUFFER (WITH BYPASSED SHADER)
 	framebuffer.begin();
@@ -56,9 +73,9 @@ void omPlayer::buffer()
 			this->draw(this->dim.marginX, this->dim.marginY, this->dim.width, this->dim.height);
 		noshader.end();		
 	framebuffer.end();
-	
+
 	//BLUR
-	if (fx.blur > 0) this->blur();	
+	if (params.blur > 0) this->blur();	
 }
 
 void omPlayer::display()
@@ -66,15 +83,22 @@ void omPlayer::display()
 	if (this->isTextureEnabled) framebuffer.draw(0, 0);
 }
 
+void omPlayer::clearscreen()
+{
+	framebuffer.begin();
+		ofClear(0,0,0,0);
+	framebuffer.end();
+}
+
 void omPlayer::blur()
 {	
-	for(int i = 0; i < 2; i++) 
+	for(int i = 0; i < 1; i++) 
 	{	
 		//BLUR HORIZONTAL
 		frameblur.begin();	
 			blurH.begin();
 				blurH.setUniformTexture("tex0", framebuffer.getTextureReference(0), 0);
-				blurH.setUniform1f("radius", (fx.blur/100.));
+				blurH.setUniform1f("radius", (params.blur/2500.));
 				framebuffer.draw(0,0);
 			blurH.end();
 		frameblur.end();
@@ -83,7 +107,7 @@ void omPlayer::blur()
 		framebuffer.begin();
 			blurV.begin();
 				blurV.setUniformTexture("tex0", frameblur.getTextureReference(0), 0);
-				blurV.setUniform1f("radius", (fx.blur/100.));
+				blurV.setUniform1f("radius", (params.blur/2500.));
 				frameblur.draw(0,0);
 			blurV.end();
 		framebuffer.end();
@@ -101,7 +125,6 @@ void omPlayer::play(vector<string> playlist, bool doLoop)
 	
 	for(int k = 0; k < playlist.size(); k++)
 	{			
-		ofLog(OF_LOG_NOTICE,"-HP- add  "+playlist[k]+" to the playlist");
 		ofFile file(playlist[k]);
 		if (file.isFile()) list.push_back(file);
 		else if (file.isDirectory())
@@ -113,8 +136,8 @@ void omPlayer::play(vector<string> playlist, bool doLoop)
 		}
 	}
 	
-	for(int k = 0; k < list.size(); k++)
-		ofLog(OF_LOG_NOTICE,"-HP- "+list[k].path()+" in the playlist");
+	/*for(int k = 0; k < list.size(); k++)
+		ofLog(OF_LOG_NOTICE,"-HP- "+list[k].path()+" in the playlist");*/
 	
 	this->videoFiles = list;
 	
@@ -160,8 +183,7 @@ void omPlayer::play(){
 	this->setup(this->settings);
 	
 	ofLog(OF_LOG_NOTICE,"-HP- play "+getFile());
-		
-	this->volume();	
+			
 	this->setPaused(false);
 }
 
@@ -210,6 +232,7 @@ void omPlayer::prev()
 void omPlayer::stop(){
 	
 	this->close();
+	this->clearscreen();
 	
 	ofLog(OF_LOG_NOTICE,"-HP- stop ");
 }
@@ -229,21 +252,31 @@ void omPlayer::resume(){
 }
 
 //--------------------------------------------------------------
-void omPlayer::volume(){
-	this->volume(currentVolume);
+void omPlayer::setName(string name){
+	this->params.name = name;
 }
 
 //--------------------------------------------------------------
 void omPlayer::volume(int v){
-	currentVolume = v;
-	if (muteVolume) this->setVolume(0.0);
-	else this->setVolume(currentVolume/100.0);
+	params.volume = v;
+}
+
+//--------------------------------------------------------------
+void omPlayer::applyVolume(){
+	float v;
+	if (params.mute) v = 0.0;
+	else v = params.volume/100.0;
+	
+	if (v != settings.initialVolume) 
+	{
+		settings.initialVolume = v;
+		this->setVolume(settings.initialVolume);
+	}
 }
 
 //--------------------------------------------------------------
 void omPlayer::setMuted(bool mute){
-	muteVolume = mute;
-	this->volume();
+	params.mute = mute;
 }
 
 //--------------------------------------------------------------
@@ -266,18 +299,42 @@ void omPlayer::setLoop(bool doLoop){
 	else this->enableLoopingList = doLoop;	
 }
 
+//--------------------------------------------------------------
+void omPlayer::setBlur(int blur)
+{
+	this->params.blur = blur;
+}
+
+//--------------------------------------------------------------
+void omPlayer::setZoom(int zoom)
+{
+	this->params.zoom = zoom;
+}
 
 
 //STATE
 
 //--------------------------------------------------------------
+string omPlayer::getName(){
+	return this->params.name;
+}
+
+//--------------------------------------------------------------
 int omPlayer::getVolumeInt(){
-	return static_cast<int>(currentVolume*100.0);
+	return this->params.volume;
+}
+
+int omPlayer::getZoom(){
+	return this->params.zoom;
+}
+
+int omPlayer::getBlur(){
+	return this->params.blur;
 }
 
 //--------------------------------------------------------------
 bool omPlayer::isMuted(){
-	return muteVolume;
+	return params.mute;
 }
 
 //--------------------------------------------------------------

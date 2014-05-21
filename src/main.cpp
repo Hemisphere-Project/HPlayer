@@ -14,7 +14,7 @@ int main(int argc, const char** argv)
 	ofSetupOpenGL(1280, 720, OF_WINDOW);
 	
 	ofBackground(0, 255);
-	ofSetFrameRate(30);
+	ofSetFrameRate(25);
 	
 	ofRunApp( new HPlayer());
 }

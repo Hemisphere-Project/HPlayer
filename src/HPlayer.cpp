@@ -29,15 +29,14 @@ void HPlayer::setup()
 	
 	//PLAYER SETTINGS	
 	int defaultVolume = 50;
-	bool loop = true;
-	player.audioHDMI = false;
+	bool audioHDMI = false;
 
 	if (ofxArgParser::hasKey("volume")) defaultVolume = ofToInt(ofxArgParser::getValue("volume"));
-	if (ofxArgParser::hasKey("ahdmi")) player.audioHDMI = (ofToInt(ofxArgParser::getValue("ahdmi")) == 1);
-	if (ofxArgParser::hasKey("loop")) loop = (ofToInt(ofxArgParser::getValue("loop")) == 1);	
+	if (ofxArgParser::hasKey("ahdmi")) audioHDMI = (ofToInt(ofxArgParser::getValue("ahdmi")) == 1);
 	
 	//INIT PLAYER
-	player.init();
+	player.init(audioHDMI);	
+	player.setName(playerName);
 	player.volume(defaultVolume);
 	lastFrame = 0;
 	freeze = 0;
@@ -45,6 +44,9 @@ void HPlayer::setup()
 	//AUTOSTART WITH MEDIA PATH
 	if (ofxArgParser::hasKey("media")) 
 	{
+		bool loop = true;
+		if (ofxArgParser::hasKey("loop")) loop = (ofToInt(ofxArgParser::getValue("loop")) == 1);	
+		
 		vector<string> playlist;
 		playlist.push_back(ofxArgParser::getValue("media"));
 		player.play( playlist, loop);		
@@ -114,7 +116,7 @@ void HPlayer::displayInfo() {
 
 	stringstream info;
 	info << "------- HPLAYER INFO -----------\n";
-	info <<"\n" << "NAME " << playerName;
+	info <<"\n" << "NAME " << player.getName();
 	info <<"\n" << "APP FPS: 	"+ ofToString(ofGetFrameRate());
 	info <<"\n" <<	"IS PLAYING: 	"			<< std::boolalpha << player.isPlaying();
 	info <<"\n" <<	"IS PAUSED: 	"			<< std::boolalpha << player.isPaused();

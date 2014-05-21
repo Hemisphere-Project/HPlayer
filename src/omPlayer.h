@@ -9,8 +9,13 @@ struct dims_t {
 	int marginY;
 };
 
-struct fx_t {
-	int blur;
+struct params_t {
+	string 	name;
+	int 	volume;
+	bool 	mute;
+	int 	blur;
+	int 	zoom;
+	
 };
 
 class omPlayer : public ofxOMXPlayer 
@@ -19,16 +24,11 @@ class omPlayer : public ofxOMXPlayer
 	public:
 
 		//RUN
-		void init();
+		void init(bool audioHDMI);
 		void buffer();
 		void display();
 		
-		//FX
-		void blur();
 		
-		//BUFFER & SHADER
-		ofShader noshader, blurH, blurV;
-		ofFbo framebuffer, frameblur;
 		
 		//CONTROL
 		void play(vector<string> playlist, bool doLoop);
@@ -42,14 +42,21 @@ class omPlayer : public ofxOMXPlayer
 		void resume();
 		void stop();
 		
+		void setName(string name);
 		void volume();
 		void volume(int v);
+		void applyVolume();
 		void setMuted(bool mute);
 		void setLoop(bool doLoop);
+		void setBlur(int blur);
+		void setZoom(int zoom);
 		
 		
 		//STATE
+		string 	getName();
 		int  	getVolumeInt();
+		int 	getBlur();
+		int 	getZoom();
 		bool 	isMuted();	
 		bool 	isLoop();
 		int 	getCurrentFrameNbr();
@@ -57,16 +64,19 @@ class omPlayer : public ofxOMXPlayer
 		int 	getDurationMs();
 		string 	getFile();
 		int		playlistSize();
-
-		//SETTINGS
-		bool audioHDMI;
 		
 	private:
+				
+		//APPLY FX
+		void clearscreen();
+		void blur();
+		
+		//BUFFER & SHADER
+		ofShader noshader, blurH, blurV;
+		ofFbo framebuffer, frameblur;				
 					
 		dims_t			dim;
-		fx_t			fx;		
-		int 			currentVolume;
-		bool 			muteVolume;
+		params_t		params;	
 		vector<ofFile> 	videoFiles;
 		int				currentIndex;
 		bool			enableLoopingList;

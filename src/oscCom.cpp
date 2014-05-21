@@ -11,8 +11,6 @@ void oscCom::connect()
 void oscCom::execute(omPlayer* player)
 {
 	if (!connected) return;
-	
-	bool sendStats = false;
 	if (oscListener.hasWaitingMessages()) oscDebug = "";
 	
 	//OSC GET
@@ -65,10 +63,7 @@ void oscCom::execute(omPlayer* player)
 		}		
 		else if(command == "volume")
 		{
-			if (m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->volume(m.getArgAsFloat(0));
-			else if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->volume(m.getArgAsInt32(0));
-		
-			//if (player->isMuted()) player->setMuted(false);
+			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->volume(m.getArgAsInt32(0));
 		}
 		else if(command == "mute")
 		{
@@ -92,9 +87,17 @@ void oscCom::execute(omPlayer* player)
 		{
 			player->setLoop(false);
 		}
+		else if(command == "blur")
+		{
+			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->setBlur(m.getArgAsInt32(0));
+		}
+		else if(command == "zoom")
+		{
+			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->setZoom(m.getArgAsInt32(0));
+		}			
 		else if(command == "info")
 		{
-			enableInfo = !enableInfo;
+			//enableInfo = !enableInfo;
 		}			
 		else if(command == "quit")
 		{
@@ -106,7 +109,7 @@ void oscCom::execute(omPlayer* player)
 		oscDebug += this->oscToString(m)+"\n";
     }	
     
-    this->status();  
+    this->status(player);  
 }
 
 string oscCom::log() {
@@ -136,7 +139,7 @@ void oscCom::status(omPlayer* player)
 	
 	ofxOscMessage m;
 	m.setAddress("/status");
-	m.addStringArg(playerName);
+	m.addStringArg(player->getName());
 	
 	string filepath = player->getFile();
 	if (base64) filepath = ofxCrypto::base64_encode(filepath);
@@ -164,6 +167,9 @@ void oscCom::status(omPlayer* player)
 	
 	if (player->isMuted()) m.addStringArg("muted");
 	else m.addStringArg("unmuted");
+	
+	m.addIntArg(player->getZoom());
+	m.addIntArg(player->getBlur());
 	
 	oscSender.sendMessage(m);
 }
