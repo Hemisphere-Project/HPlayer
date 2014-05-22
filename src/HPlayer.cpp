@@ -30,14 +30,20 @@ void HPlayer::setup()
 	//PLAYER SETTINGS	
 	int defaultVolume = 50;
 	bool audioHDMI = false;
+	int defaultZoom = 100;
+	int defaultBlur = 0;
 
 	if (ofxArgParser::hasKey("volume")) defaultVolume = ofToInt(ofxArgParser::getValue("volume"));
 	if (ofxArgParser::hasKey("ahdmi")) audioHDMI = (ofToInt(ofxArgParser::getValue("ahdmi")) == 1);
+	if (ofxArgParser::hasKey("zoom")) defaultZoom = ofToInt(ofxArgParser::getValue("zoom"));
+	if (ofxArgParser::hasKey("blur")) defaultBlur = ofToInt(ofxArgParser::getValue("blur"));
 	
 	//INIT PLAYER
 	player.init(audioHDMI);	
 	player.setName(playerName);
 	player.volume(defaultVolume);
+	player.setZoom(defaultZoom);
+	player.setBlur(defaultBlur);
 	lastFrame = 0;
 	freeze = 0;
 	
