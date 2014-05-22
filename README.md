@@ -67,16 +67,19 @@ cd ~/openFrameworks/addons/
 git clone https://github.com/jvcleave/ofxOMXPlayer.git
 git clone https://github.com/satoruhiga/ofxArgParser.git
 git clone https://github.com/jkosoy/ofxCrypto.git
+```
 
 3. Clone project HPlayer into $OF/apps/myApps/
 ```bash
 cd ~/openFrameworks/apps/myApps/ 
 git clone https://github.com/Hemisphere-Project/HPlayer.git
+```
 
 4. You are now ready to compile the player.
 ```bash
 cd ~/openFrameworks/apps/myApps/HPlayer
 make
+```
 
 5. Once it's done, you can test it with "./bin/Hplayer [--args]"
 or copy the content of the bin/ directory to your usual binary path
