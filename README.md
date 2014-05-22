@@ -45,12 +45,13 @@ Installation from source
 -------------
 
 HPlayer is build on top of
-	- OpenFrameworks 0.8.x ARMv6
-	- ofxOsc (now embedded with OF-0.8)
-	- ofxOMXPlayer from jvcleave
-	- ofxCrypto from jkosoy 
-	- ofxArgParser from satoruhiga
+	* OpenFrameworks 0.8.x ARMv6
+	* ofxOsc (now embedded with OF-0.8)
+	* ofxOMXPlayer from jvcleave
+	* ofxCrypto from jkosoy 
+	* ofxArgParser from satoruhiga
 
+---
 
 0. Setup and Update your RaspberryPi 
 	* Expand filesystem
@@ -61,7 +62,7 @@ HPlayer is build on top of
 1. Download / Install OpenFrameworks ARMv6 somewhere like ~/openFrameworks/
 >Instructions: http://www.openframeworks.cc/setup/raspberrypi/
 
-2. Clone ofxOMXPlayer // ofxArgParser // ofxCrypto
+2. Clone Addons ofxOMXPlayer / ofxArgParser / ofxCrypto
 ```bash
 cd ~/openFrameworks/addons/ 
 git clone https://github.com/jvcleave/ofxOMXPlayer.git
@@ -69,7 +70,7 @@ git clone https://github.com/satoruhiga/ofxArgParser.git
 git clone https://github.com/jkosoy/ofxCrypto.git
 ```
 
-3. Clone project HPlayer into $OF/apps/myApps/
+3. Clone project HPlayer
 ```bash
 cd ~/openFrameworks/apps/myApps/ 
 git clone https://github.com/Hemisphere-Project/HPlayer.git
@@ -112,26 +113,28 @@ HPlayer supports various optional command line arguments:
 	--loop <0:1>		: If autostarted media should loop (default=1)
 	
 EXEMPLE (assuming /home/pi/media contains some videos):
+```bash
 ./HPlayer --media /home/pi/media --loop 1 --zoom 50 --info 1
-	
+```
+
 Once started, HPlayer can be controlled with OSC commands over the network. The available OSC commands are:
 
-/play [<path1>] [<path2>] ...		: Play the file (or dir) list in order
-/playloop [<path1>] [<path2>] ...	: Same as play with playlist loop
-/stop			: Stop and rewind the current video file
-/pause			: Pause the video file
-/resume			: Resume the paused file
-/next			: Play the next file in the list
-/prev			: Play the previous file in the list
-/volume <0:100>		: Set volume from 0 to 100
-/mute			: Mute the sound of the video
-/unmute			: Unmute the sound of the video
-/loop			: Enable looping for the current playlist
-/unloop			: Disable looping for the current playlist
-/blur <0:100>		: Set blur level from 0 to 100
-/zoom <0:100>		: Set zoom from 0 to 100%
-/info			: Toggle media info window (disabled)
-/quit			: Exit the player
+	/play [<path1>] [<path2>] ...		: Play the file (or dir) list in order
+	/playloop [<path1>] [<path2>] ...	: Same as play with playlist loop
+	/stop			: Stop and rewind the current video file
+	/pause			: Pause the video file
+	/resume			: Resume the paused file
+	/next			: Play the next file in the list
+	/prev			: Play the previous file in the list
+	/volume <0:100>		: Set volume from 0 to 100
+	/mute			: Mute the sound of the video
+	/unmute			: Unmute the sound of the video
+	/loop			: Enable looping for the current playlist
+	/unloop			: Disable looping for the current playlist
+	/blur <0:100>		: Set blur level from 0 to 100
+	/zoom <0:100>		: Set zoom from 0 to 100%
+	/info			: Toggle media info window (disabled)
+	/quit			: Exit the player
 
 
 Credits
