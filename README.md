@@ -53,16 +53,16 @@ HPlayer is build on top of:
 
 ---
 
-###0. Setup and Update your RaspberryPi 
+####0. Setup and Update your RaspberryPi 
 	* Expand filesystem
 	* Split GPU memory to 128 or 256
 	* Overclock if you want to
 	* install and run rpi-update (https://github.com/Hexxeh/rpi-update)
 
-###1. Download / Install OpenFrameworks ARMv6 somewhere like ~/openFrameworks/
+####1. Download / Install OpenFrameworks ARMv6
 >Instructions: http://www.openframeworks.cc/setup/raspberrypi/
 
-###2. Clone Addons ofxOMXPlayer / ofxArgParser / ofxCrypto
+####2. Clone Addons ofxOMXPlayer / ofxArgParser / ofxCrypto
 ```bash
 cd ~/openFrameworks/addons/ 
 git clone https://github.com/jvcleave/ofxOMXPlayer.git
@@ -70,19 +70,19 @@ git clone https://github.com/satoruhiga/ofxArgParser.git
 git clone https://github.com/jkosoy/ofxCrypto.git
 ```
 
-###3. Clone project HPlayer
+####3. Clone project HPlayer
 ```bash
 cd ~/openFrameworks/apps/myApps/ 
 git clone https://github.com/Hemisphere-Project/HPlayer.git
 ```
 
-###4. You are now ready to compile the player.
+####4. You are now ready to compile the player.
 ```bash
 cd ~/openFrameworks/apps/myApps/HPlayer
 make
 ```
 
-###5. Once it's done, you can test it with "./bin/Hplayer [--args]"
+####5. Once it's done, you can test it with "./bin/Hplayer [--args]"
 or copy the content of the bin/ directory to your usual binary path
 (don't forget de data subdirectory!). Use ./HPlayer [--args] to start the player
 We will provide a "make install" routine as soon as the player become more stable.
