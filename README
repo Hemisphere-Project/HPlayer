@@ -28,7 +28,7 @@ HPlayer has playlist capability: you can supply multiple file to play, or just a
 the player will handle the playlist and loop over if asked.
 
 Only one GL effect is available for now, the blur effect.
-It's a proof-of-concept and will extended to custom shaders.
+It's a proof-of-concept and it will be extended to custom shaders later on.
 When the blur level is set to 0, the shader is simply bypassed so there is no overload
 if you don't want to use the effects.
 
