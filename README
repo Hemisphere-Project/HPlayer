@@ -9,11 +9,12 @@
                                        /\___/            
                                        \/__/             
                                        
-## Hemisphere OSC MediaPlayer for Raspberry Pi
+Hemisphere OSC MediaPlayer for Raspberry Pi
+-------------
 
 
 What is it
-***********
+-------------
 
 HPlayer is a video player for RaspberryPi controllable with OSC commands.
 
@@ -34,14 +35,14 @@ The player covers the whole screen with a black background and keep video aspect
 
 
 Installation from binary
-************************
+-------------
 
 You can simply download the content of the bin folder with the last build.
 Don't forget the data subfolder which contains the shaders. It will not work without this folder. We will include those extra files into the binary in a futur release for more convinience
 
 
 Installation from source
-************************
+-------------
 
 HPlayer is build on top of
 	- OpenFrameworks 0.8.x ARMv6
@@ -87,7 +88,7 @@ or copy the content of the bin/ directory to your usual binary path
 We will provide a "make install" routine as soon as the player become more stable.
 
 Use it!
-*******
+-------------
 
 Be Aware that HPlayer is still a work in progress, and some features could
 have major or minor bugs. 
@@ -134,7 +135,7 @@ Once started, HPlayer can be controlled with OSC commands over the network. The 
 
 
 Credits
-*******
+-------------
 
 HPlayer is developped by the Hemisphere-Project Team
 ++ Thomas Bohl ++
