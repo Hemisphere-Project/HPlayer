@@ -20,7 +20,9 @@ HPlayer is a video player for RaspberryPi controllable with OSC commands.
 
 The player is build on top of OMXPlayer and OpenFrameworks,
 it's GPU accelerated and offers OpenGL Shaders and Textures support.
+
 HPlayer is developped under the terms of GNU GPL v2.
+
 You can find a copy of this license in the LICENSE file.
 
 HPlayer supports command line arguments to start the player with a given setup, so the use of OSC is not compulsory. You can still use it like the original OMXPlayer, but with more flexibility.
@@ -117,7 +119,8 @@ EXEMPLE (assuming /home/pi/media contains some videos):
 ./HPlayer --media /home/pi/media --loop 1 --zoom 50 --info 1
 ```
 
-Once started, HPlayer can be controlled with OSC commands over the network. 
+Once started, HPlayer can be controlled with OSC commands over the network.
+
 The available OSC commands are:
 
 	/play [<path1>] [<path2>] ...		: Play the file (or dir) list in order
