@@ -21,6 +21,27 @@ it's GPU accelerated and offers OpenGL Shaders and Textures support.
 HPlayer is developped under the terms of GNU General Public License version 2.
 You can find a copy of this license in the LICENSE file.
 
+HPlayer also support command line arguments to directly start the player with a given setup,
+so the use of OSC is not compulsory. 
+
+HPlayer has playlist capability: you can supply multiple file to play, or just a directory path,
+the player will handle the playlist and loop over if asked.
+
+Only one GL effect is available for now, the blur effect.
+It's a proof-of-concept and will extended to custom shaders.
+When the blur level is set to 0, the shader is simply bypassed so there is no overload
+if you don't want to use the effects.
+
+The player cover the whole screen and keep video aspect ratio so you don't need to bother
+with clearing the background like with OMXPlayer. There is also a zoom out function that allow
+resizing down the video to fit a specific display configuration.
+
+Installation from binary
+************************
+
+You can simply download the content of the bin folder with the last build.
+Don't forget the data subfolder which contains the shaders. It will not work without this folder.
+We will include those extra files into the binary in a futur release.
 
 Installation from source
 ************************
@@ -77,7 +98,7 @@ HPlayer supports various command line arguments:
 	--name <nick>		:	Name your player instance (default=HPlayer)
 	--in <port> 		:	Input OSC Port (default=9000)
 	--out <port> 		:	Output OSC Port (default=9001)
-	--base64 <0:1>			:	Enable bas64 encoding for filepath (default=0)		
+	--base64 <0:1>		:	Enable bas64 encoding for filepath (default=0)		
 	--info <0:1>		:	Display info window	(default=0)	
 
 	--volume <0:100>	:	Volume (default=50)
@@ -88,7 +109,8 @@ HPlayer supports various command line arguments:
 	--media <path>		:	File or Directory path for autostart
 	--loop <0:1>		:	If autostarted media should loop (default=1)
 	
-	
+EXEMPLE:
+./HPlayer --media /home/pi/media --loop 1 --zoom 50 --info 1
 	
 Once started, HPlayer can be controlled with OSC commands over the network.
 The available commands are:
