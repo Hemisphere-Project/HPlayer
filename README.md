@@ -10,7 +10,7 @@
                                        \/__/             
 ```
 
-Hemisphere OSC MediaPlayer for Raspberry Pi
+HPlayer OSC MediaPlayer for Raspberry Pi
 -------------
 
 
