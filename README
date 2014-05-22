@@ -25,7 +25,7 @@ You can find a copy of this license in the LICENSE file.
 Installation from source
 ************************
 
-HPlayer is based on
+HPlayer is build on top of
 - OpenFrameworks 0.8.x ARMv6
 - ofxOsc (now embedded with OF-0.8)
 - ofxOMXPlayer from jvcleave
