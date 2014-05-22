@@ -1,4 +1,4 @@
-
+```
  __  __  ____    ___                                     
 /\ \/\ \/\  _`\ /\_ \                                    
 \ \ \_\ \ \ \L\ \//\ \      __     __  __     __   _ __  
@@ -8,7 +8,8 @@
     \/_/\/_/\/_/   \/____/\/__/\/_/ `/___/> \/____/ \/_/ 
                                        /\___/            
                                        \/__/             
-                                       
+```
+
 Hemisphere OSC MediaPlayer for Raspberry Pi
 -------------
 
@@ -85,9 +86,11 @@ cd ~/openFrameworks/apps/myApps/HPlayer
 make
 ```
 
-####5. Once it's done, you can test it with "./bin/Hplayer [--args]"
-or copy the content of the bin/ directory to your usual binary path
-(don't forget de data subdirectory!). Use ./HPlayer [--args] to start the player
+####5. Test it 
+```bash
+./bin/Hplayer [--args]
+```
+You can copy the content of the ./bin directory to your usual binary path (don't forget de data subdirectory with the shaders !).
 We will provide a "make install" routine as soon as the player become more stable.
 
 
