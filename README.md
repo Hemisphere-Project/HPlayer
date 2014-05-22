@@ -46,11 +46,13 @@ Installation from source
 -------------
 
 HPlayer is build on top of:
+```
 	* OpenFrameworks 0.8.x ARMv6
 	* ofxOsc (now embedded with OF-0.8)
 	* ofxOMXPlayer from jvcleave
 	* ofxCrypto from jkosoy 
 	* ofxArgParser from satoruhiga
+```
 
 ---
 
