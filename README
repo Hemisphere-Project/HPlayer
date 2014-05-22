@@ -129,8 +129,8 @@ Once started, HPlayer can be controlled with OSC commands over the network. The 
 /unloop			: Disable looping for the current playlist
 /blur <0:100>		: Set blur level from 0 to 100
 /zoom <0:100>		: Set zoom from 0 to 100%
-/info			:	Toggle media info window (disabled)
-/quit			:	Exit the player
+/info			: Toggle media info window (disabled)
+/quit			: Exit the player
 
 
 Credits
