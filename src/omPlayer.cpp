@@ -96,6 +96,7 @@ void omPlayer::blur()
 	{	
 		//BLUR HORIZONTAL
 		frameblur.begin();	
+			ofClear(0,0,0,0);
 			blurH.begin();
 				blurH.setUniformTexture("tex0", framebuffer.getTextureReference(0), 0);
 				blurH.setUniform1f("radius", (params.blur/2500.));
@@ -135,9 +136,6 @@ void omPlayer::play(vector<string> playlist, bool doLoop)
 				if (dir.getFile(j).isFile()) list.push_back(dir.getFile(j));
 		}
 	}
-	
-	/*for(int k = 0; k < list.size(); k++)
-		ofLog(OF_LOG_NOTICE,"-HP- "+list[k].path()+" in the playlist");*/
 	
 	this->videoFiles = list;
 	
