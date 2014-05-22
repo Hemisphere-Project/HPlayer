@@ -144,18 +144,20 @@ Credits
 -------------
 
 HPlayer is developped by the Hemisphere-Project Team
+```
 	++ Thomas Bohl ++
 	++ Alain Barthelemy ++
 	++ Jeremie Forge ++
-
+```
 And we thank the hard work of 
+```
 	++ RaspberryPi Creators ++
 	++ OpenFrameworks Developpers ++
 	++ OMXPlayer Developpers ++
 	++ jvcleave ++
 	++ jkosoy ++
 	++ satoruhiga ++
-
+```
 
 
 
