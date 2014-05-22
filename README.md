@@ -22,7 +22,6 @@ The player is build on top of OMXPlayer and OpenFrameworks,
 it's GPU accelerated and offers OpenGL Shaders and Textures support.
 
 HPlayer is developped under the terms of GNU GPL v2.
-
 You can find a copy of this license in the LICENSE file.
 
 HPlayer supports command line arguments to start the player with a given setup, so the use of OSC is not compulsory. You can still use it like the original OMXPlayer, but with more flexibility.
@@ -145,17 +144,17 @@ Credits
 -------------
 
 HPlayer is developped by the Hemisphere-Project Team
-++ Thomas Bohl ++
-++ Alain Barthelemy ++
-++ Jeremie Forge ++
+	++ Thomas Bohl ++
+	++ Alain Barthelemy ++
+	++ Jeremie Forge ++
 
 And we thank the hard work of 
-++ RaspberryPi Creators ++
-++ OpenFrameworks Developpers ++
-++ OMXPlayer Developpers ++
-++ jvcleave ++
-++ jkosoy ++
-++ satoruhiga ++
+	++ RaspberryPi Creators ++
+	++ OpenFrameworks Developpers ++
+	++ OMXPlayer Developpers ++
+	++ jvcleave ++
+	++ jkosoy ++
+	++ satoruhiga ++
 
 
 
