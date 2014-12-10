@@ -90,7 +90,7 @@ make
 ```bash
 ./bin/Hplayer [--args]
 ```
-You can copy the content of the ./bin directory to your usual binary path (don't forget de data subdirectory with the shaders !).
+You can copy the content of the ./bin directory to your usual binary path (don't forget the data subdirectory with the shaders !).
 We will provide a "make install" routine as soon as the player become more stable.
 
 
