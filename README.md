@@ -74,6 +74,23 @@ git clone https://github.com/satoruhiga/ofxArgParser.git
 git clone https://github.com/jkosoy/ofxCrypto.git
 ```
 
+###2.b Apply bug fix on ofxOMX compilation
+
+If you have "fatal error: libavcodec/opt.h: No such file or directory"
+when trying to compile, create the file "addons/ofxOMXPlayer/libs/ffmpeg/include/libavcodec/"
+and put this:
+
+##### opt.h
+```
+#ifndef AVCODEC_OPT_H
+#define AVCODEC_OPT_H
+#include "libavcodec/version.h"
+#if FF_API_OPT_H
+#include "libavutil/opt.h"
+#endif
+#endif // AVCODEC_OPT_H
+```
+
 ####3. Clone project HPlayer
 ```bash
 cd ~/openFrameworks/apps/myApps/ 
