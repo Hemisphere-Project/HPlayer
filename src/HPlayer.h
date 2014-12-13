@@ -4,6 +4,7 @@
 #include "omPlayer.h"
 #include "ofxCrypto.h"
 #include "ofxArgParser.h"
+#include "xmlSettings.h"
 #include "oscCom.h"
 
 #define OSCPORT_IN 	9000
@@ -18,6 +19,8 @@ class HPlayer : public ofBaseApp
 		void setup();
 		void update();
 		void draw();
+
+		void keyPressed(int key);
 	
 	private:
 	
@@ -36,6 +39,9 @@ class HPlayer : public ofBaseApp
 		//DISPLAY TOOLS
 		void 	displayInfo();
 		void 	displayStandby();
+
+		//EVENTS
+		char eventString[255];
 		
 		
 };

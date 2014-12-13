@@ -24,13 +24,16 @@ class omPlayer : public ofxOMXPlayer
 	public:
 
 		//RUN
-		void init(bool audioHDMI);
+		void init(bool textured, bool audioHDMI);
+		void basepath(string path);
+
 		void buffer();
 		void display();
 		
 		
 		
 		//CONTROL
+		void load(vector<string> playlist, bool doLoop);
 		void play(vector<string> playlist, bool doLoop);
 		void play(string file, bool doLoop);
 		void play(int index);		
@@ -41,6 +44,7 @@ class omPlayer : public ofxOMXPlayer
 		void pause();
 		void resume();
 		void stop();
+		void seek(int timemilli);
 		
 		void setName(string name);
 		void volume();
@@ -64,9 +68,14 @@ class omPlayer : public ofxOMXPlayer
 		int 	getDurationMs();
 		string 	getFile();
 		int		playlistSize();
+
+		int timeToFrameMs(int timemilli);
 		
 	private:
 				
+		//INTERNAL
+		void doplay();
+
 		//APPLY FX
 		void clearscreen();
 		void blur();
@@ -80,6 +89,8 @@ class omPlayer : public ofxOMXPlayer
 		vector<ofFile> 	videoFiles;
 		int				currentIndex;
 		bool			enableLoopingList;
+
+		string basePath;
 		
 		
 		

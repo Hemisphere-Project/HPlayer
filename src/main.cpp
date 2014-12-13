@@ -11,7 +11,7 @@ int main(int argc, const char** argv)
 	ofSetLogLevel(OF_LOG_NOTICE);
 
 	ofSetCurrentRenderer(ofGLProgrammableRenderer::TYPE);
-	ofSetupOpenGL(1280, 720, OF_WINDOW);
+	ofSetupOpenGL(1280, 720, OF_FULLSCREEN);
 	
 	ofBackground(0, 255);
 	ofSetFrameRate(25);
