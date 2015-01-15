@@ -146,6 +146,7 @@ void omPlayer::load(vector<string> playlist, bool doLoop)
 		}
 		else
 		{
+			ofLog(OF_LOG_NOTICE,"-HP- try to load "+basePath+playlist[k]);
 			ofFile relfile(basePath+playlist[k]);
 			if (relfile.isFile()) list.push_back(relfile);
 		}

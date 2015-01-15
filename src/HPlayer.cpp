@@ -10,11 +10,11 @@ void HPlayer::setup()
 	xmlSettings settings("settings.xml");
 
 	playerName = settings.conf_str("system","playerName","HPlayer");	
-	enableInfo = settings.conf_bool("system","enableInfo",false);
+	enableInfo = settings.conf_bool("system","enableInfo",true);
 
 	int defaultVolume = settings.conf_int("player","volume",50);
 	bool audioHDMI = settings.conf_bool("player","audioHdmi",false);
-	bool textured = settings.conf_bool("player","textured",false);
+	bool textured = settings.conf_bool("player","textured",true);
 	int defaultZoom = settings.conf_int("player","zoom",100);
 	int defaultBlur = settings.conf_int("player","blur",0);
 
@@ -62,12 +62,12 @@ void HPlayer::setup()
 	osc.connect();
 
 	//AUTOSTART
-	if (path != "")
+	/*if (path != "")
 	{
 		vector<string> playlist;		
 		playlist.push_back(path);
 		player.play( playlist, loop);
-	}
+	}*/
 	
 	//SEND STATUS
 	osc.status(&player);
