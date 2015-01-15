@@ -2,3 +2,4 @@ ofxOMXPlayer
 ofxOsc
 ofxCrypto
 ofxArgParser
+ofxXmlSettings

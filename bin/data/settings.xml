@@ -1,0 +1,64 @@
+<system>
+    <playerName>johnny</playerName>
+    <enableInfo>1</enableInfo>
+</system>
+<player>
+    <volume>50</volume>
+    <audioHdmi>0</audioHdmi>
+    <textured>0</textured>
+    <zoom>100</zoom>
+    <blur>0</blur>
+</player>
+<media>
+    <path>/home/pi/media/</path>
+    <loop>1</loop>
+</media>
+<osc>
+    <portIn>9000</portIn>
+    <portOut>7000</portOut>
+    <hostOut>127.0.0.1</hostOut>
+    <base64>0</base64>
+    <commands>default</commands>
+</osc>
+<commands>
+    <kxkm>
+        <play>playmovie</play>
+        <playloop>playmovie</playloop>
+        <load>loadmovie</load>
+        <stop>stopmovie</stop>
+        <pause>pause</pause>
+        <resume>unpause</resume>
+        <next>next</next>
+        <prev>prev</prev>
+        <seek>attime</seek>
+        <volume>volume</volume>
+        <loop>loop</loop>
+        <unloop>unloop</unloop>
+        <info>info</info>
+        <quit>quit</quit>
+        <blur>blur</blur>
+        <zoom>zoom</zoom>
+        <host>ipregie</host>
+    </kxkm>
+    <default>
+        <play>play</play>
+        <playloop>playloop</playloop>
+        <load>load</load>
+        <stop>stop</stop>
+        <pause>pause</pause>
+        <resume>resume</resume>
+        <getStatus>getStatus</getStatus>
+        <next>next</next>
+        <prev>prev</prev>
+        <volume>volume</volume>
+        <mute>mute</mute>
+        <unmute>unmute</unmute>
+        <loop>loop</loop>
+        <unloop>unloop</unloop>
+        <blur>blur</blur>
+        <zoom>zoom</zoom>
+        <info>info</info>
+        <host>host</host>
+        <quit>quit</quit>
+    </default>
+</commands>
