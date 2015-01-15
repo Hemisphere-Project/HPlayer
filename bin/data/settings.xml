@@ -1,5 +1,5 @@
 <system>
-    <playerName>ipod1</playerName>
+    <playerName>johnny</playerName>
     <enableInfo>1</enableInfo>
 </system>
 <player>
@@ -10,15 +10,15 @@
     <blur>0</blur>
 </player>
 <media>
-    <path>/home/pi/Media/</path>
+    <path>/home/pi/media/</path>
     <loop>1</loop>
 </media>
 <osc>
-    <portIn>1222</portIn>
-    <portOut>3737</portOut>
-    <hostOut>2.255.255.255</hostOut>
+    <portIn>9000</portIn>
+    <portOut>7000</portOut>
+    <hostOut>127.0.0.1</hostOut>
     <base64>0</base64>
-    <commands>kxkm</commands>
+    <commands>default</commands>
 </osc>
 <commands>
     <kxkm>
