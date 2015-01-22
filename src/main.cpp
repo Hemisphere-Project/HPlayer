@@ -8,13 +8,14 @@ int main(int argc, const char** argv)
 	//ARGS
 	ofxArgParser::init(argc, argv);
 	
-	ofSetLogLevel(OF_LOG_NOTICE);
+	//ofSetLogLevel(OF_LOG_NOTICE);
+	ofSetLogLevel(OF_LOG_WARNING);
 
 	ofSetCurrentRenderer(ofGLProgrammableRenderer::TYPE);
 	ofSetupOpenGL(1280, 720, OF_FULLSCREEN);
 	
 	ofBackground(0, 255);
-	ofSetFrameRate(25);
+	ofSetFrameRate(30);
 	
 	ofRunApp( new HPlayer());
 }

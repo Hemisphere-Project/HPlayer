@@ -1,5 +1,10 @@
 #include "omPlayer.h"
 
+omPlayer::omPlayer():ofxOMXPlayer()
+{
+	listener = NULL;
+}
+
 //--------------------------------------------------------------
 void omPlayer::init(bool textured, bool audioHDMI)
 {	
@@ -9,9 +14,9 @@ void omPlayer::init(bool textured, bool audioHDMI)
 	settings.doFlipTexture		= false; //true on older firmware
 	settings.enableTexture 		= textured;	
 	settings.initialVolume		= 0.5;
+	settings.enableLooping 		= false;
 	
 	//params DEFAULTS
-	params.name = "Raymond";
 	params.volume = settings.initialVolume;
 	params.mute = false;
 	params.blur = 0;
@@ -30,33 +35,71 @@ void omPlayer::init(bool textured, bool audioHDMI)
 		this->clearscreen();
 	}
 
+	//ANTIFREEZE
+	lastFrame = 0;
+    freeze = 0;
+
 	//START PLAYER
 	this->setup(settings);	
 }
 
-void omPlayer::basepath(string path)
+void omPlayer::setListener(omListener* myListener)
 {
-	ofDirectory dir(path);
-	if (dir.isDirectory()) basePath = path;
+	this->listener = myListener;
 }
 
 void omPlayer::buffer()
 {	
-	//IF NOT PLAYING // DO NOTHING
-	if (!this->isPlaying()) return;
+//RETURN IF NOT PLAYING
+	if (!this->isPlaying()) 
+	{
+		lastFrame = 0;
+		return;
+	}
 
-	//APPLY VOLUME CHANGES
-	this->applyVolume();
+//DETECT END / LOOP since Listener in ofxOMX are broken
+	int maxFrame = getTotalNumFrames()-1;
+	int currentFrame = getCurrentFrameNbr();	
+	//FILE REACH THE END
+	if ((currentFrame == maxFrame) and (lastFrame < maxFrame)) 
+	{
+		if (this->listener != NULL) listener->onVideoEnd();
+		//ofNotifyEvent(onPlaybackReachEnd,1);
+	}
+	//FREEZE detection (due to wrong frame counter)
+	if ((currentFrame == lastFrame) && (!this->isPaused())) 
+	{
+		freeze++;
+		if (freeze > 10) 
+		{
+			if (this->listener != NULL) listener->onVideoFreeze();
+			//ofNotifyEvent(onPlaybackFreeze,1);
+		}
+	}
+	else freeze = 0;		
+	lastFrame = currentFrame;
+
+
+//APPLY VOLUME CHANGES
+	float v;
+	if (params.mute) v = 0.0;
+	else v = params.volume/100.0;
 	
-	//IF NO VIDEO FLUX // DO NOTHING
-	if (!this->isTextureEnabled) return;
+	if (v != settings.initialVolume) 
+	{
+		settings.initialVolume = v;
+		this->setVolume(settings.initialVolume);
+	}
+	
+//IF NO VIDEO FLUX // DO NOTHING
+	if (!this->isTextureEnabled()) return;
 	if (!((this->getHeight() > 0) and (this->getWidth() > 0))) return;
 	
-	//WIDTH
+//WIDTH
 	dim.width = floor( ofGetHeight() * this->getWidth() / this->getHeight() ); //WIDTH RATIO FROM MAXIMIZED HEIGHT
 	if (dim.width > ofGetWidth()) dim.width = ofGetWidth(); //SHRINK IF WIDTH IS TO BIG
 	
-	//ZOOM
+//ZOOM
 	if (params.zoom != 100)
 	{
 		dim.width = floor( dim.width * params.zoom / 100. ); //APPLY ZOOM
@@ -64,18 +107,18 @@ void omPlayer::buffer()
 	}
 	if (!(dim.width > 0)) return;
 	
-	//HEIGHT 
+//HEIGHT 
 	dim.height = floor( dim.width * this->getHeight() / this->getWidth() ); //KEEP ASPECT RATIO
 	if (!(dim.height > 0)) return;
 	
-	//MARGINS
+//MARGINS
 	dim.marginX = floor((ofGetWidth()-dim.width)/2);
 	dim.marginY = floor((ofGetHeight()-dim.height)/2);
 	
-	//CLEAR BUFFER
+//CLEAR BUFFER
 	this->clearscreen();
 	
-	//RENDER TO FRAMEBUFFER (WITH BYPASSED SHADER)
+//RENDER TO FRAMEBUFFER (WITH BYPASSED SHADER)
 	framebuffer.begin();
 		noshader.begin();
 			noshader.setUniformTexture("tex0", this->getTextureReference(), this->getTextureID());
@@ -83,17 +126,19 @@ void omPlayer::buffer()
 		noshader.end();		
 	framebuffer.end();
 
-	//BLUR
+//BLUR
 	if (params.blur > 0) this->blur();	
+
 }
 
 void omPlayer::display()
 {
-	if (this->isTextureEnabled) framebuffer.draw(0, 0);
+	if (this->isTextureEnabled()) framebuffer.draw(0, 0);
 }
 
 void omPlayer::clearscreen()
 {
+	if (!this->isTextureEnabled()) return;
 	framebuffer.begin();
 		ofClear(0,0,0,0);
 	framebuffer.end();
@@ -125,93 +170,17 @@ void omPlayer::blur()
 }
 
 
-//CONTROL
-
-/*LOAD FILE LIST*/
-//--------------------------------------------------------------
-void omPlayer::load(vector<string> playlist, bool doLoop)
-{
-	vector<ofFile> list;
-	
-	for(int k = 0; k < playlist.size(); k++)
-	{			
-		ofFile file(playlist[k]);
-		if (file.isFile()) list.push_back(file);
-		else if (file.isDirectory())
-		{
-			ofDirectory dir(playlist[k]);
-			dir.listDir();
-			for(int j = 0; j < dir.size(); j++)
-				if (dir.getFile(j).isFile()) list.push_back(dir.getFile(j));
-		}
-		else
-		{
-			ofLog(OF_LOG_NOTICE,"-HP- try to load "+basePath+playlist[k]);
-			ofFile relfile(basePath+playlist[k]);
-			if (relfile.isFile()) list.push_back(relfile);
-		}
-	}
-	
-	this->videoFiles = list;
-
-	this->setLoop(doLoop);
-}
-
-/*PLAY FILE LIST*/
-//--------------------------------------------------------------
-void omPlayer::play(vector<string> playlist, bool doLoop)
-{	
-	this->load(playlist,doLoop);
-
-	//NO FILES IN THE LIST: DO NOTHING
-	if (this->playlistSize() == 0) 
-	{
-		this->stop();
-		return;
-	}
-	
-	//START PLAY AT 0
-	this->play(0);
-}
-
-/*PLAY FILE*/
-//--------------------------------------------------------------
-void omPlayer::play(string file, bool doLoop)
-{
-	vector<string> playlist;
-	playlist.push_back(file);
-	this->play(playlist,doLoop);
-}
-
-/*PLAY FILE AT INDEX IN THE LIST*/
-//--------------------------------------------------------------
-void omPlayer::play(int index){
-	
-	if ((index >= 0) && (index < playlistSize())) 
-	{
-		currentIndex = index;		
-		this->settings.videoPath = videoFiles[currentIndex].path();
-		this->doplay();
-	}
-}
-
-/*PLAY FIRST OF THE LIST*/
-//--------------------------------------------------------------
-void omPlayer::play(){
-		
-	if (playlistSize() > 0) this->play(0);
-}
-
 /*START PLAYER*/
 //--------------------------------------------------------------
-void omPlayer::doplay(){
+void omPlayer::play(string file){
 		
-	if (this->isOpen) this->stop(); 
+	if (this->isPlaying()) this->stop(); 
+	this->settings.videoPath = file;
 	this->setup(this->settings);
-	
-	ofLog(OF_LOG_NOTICE,"-HP- play "+getFile());
-			
-	this->setPaused(false);
+
+	//this->loadMovie(file);
+
+	this->setPaused(false);	
 }
 
 /*SEEK TO TIME MILLISECONDS*/
@@ -222,73 +191,22 @@ void omPlayer::seek(int timemilli){
 	//TODO
 }
 
-/*PLAY NEXT FILE IN THE LIST*/
-//--------------------------------------------------------------
-void omPlayer::next()
-{
-	//if only one file
-	if (this->playlistSize() == 1)
-	{
-		if (!this->isLoop()) this->stop();
-		return;
-	}
-	
-	//playlist
-	int index = currentIndex+1;
-	if (index >= videoFiles.size()) 
-	{
-		if (this->isLoop()) this->play(0);
-		else this->stop();
-	}
-	else this->play(index);
-}
-
-/*PLAY PREVIOUS FILE IN THE LIST*/
-//--------------------------------------------------------------
-void omPlayer::prev()
-{
-	//if only one file
-	if (this->playlistSize() == 1)
-	{
-		if (!this->isLoop()) this->stop();
-		return;
-	}
-	
-	int index = currentIndex-1;
-	if (index < 0) 
-	{
-		if (this->isLoop()) this->play((videoFiles.size()-1));
-		else this->stop();
-	}
-	else this->play(index);
-}
 
 //--------------------------------------------------------------
-void omPlayer::stop(){
-	
+void omPlayer::stop()
+{	
 	this->close();
 	this->clearscreen();
-	
-	ofLog(OF_LOG_NOTICE,"-HP- stop ");
 }
 
 //--------------------------------------------------------------
 void omPlayer::pause(){
 	this->setPaused(true);
-	
-	ofLog(OF_LOG_NOTICE,"-HP- pause ");
 }
 
 //--------------------------------------------------------------
 void omPlayer::resume(){
 	this->setPaused(false);
-	
-	ofLog(OF_LOG_NOTICE,"-HP- resume ");
-}
-
-//--------------------------------------------------------------
-void omPlayer::setName(string name){
-	this->params.name = name;
 }
 
 //--------------------------------------------------------------
@@ -297,41 +215,8 @@ void omPlayer::volume(int v){
 }
 
 //--------------------------------------------------------------
-void omPlayer::applyVolume(){
-	float v;
-	if (params.mute) v = 0.0;
-	else v = params.volume/100.0;
-	
-	if (v != settings.initialVolume) 
-	{
-		settings.initialVolume = v;
-		this->setVolume(settings.initialVolume);
-	}
-}
-
-//--------------------------------------------------------------
 void omPlayer::setMuted(bool mute){
 	params.mute = mute;
-}
-
-//--------------------------------------------------------------
-void omPlayer::setLoop(bool doLoop){
-	
-	this->enableLoopingList = false;
-	this->settings.enableLooping = false;
-	
-	//ONLY ONE FILE IN THE LIST
-	if (videoFiles.size() == 1)
-	{
-		if (this->settings.enableLooping != doLoop)
-		{
-			this->settings.enableLooping = doLoop;
-			if (this->isPlaying()) this->play();
-		}
-	}
-	
-	//NONE OR MULTIPLE FILES PLAYLIST
-	else this->enableLoopingList = doLoop;	
 }
 
 //--------------------------------------------------------------
@@ -346,37 +231,6 @@ void omPlayer::setZoom(int zoom)
 	this->params.zoom = zoom;
 }
 
-
-//STATE
-
-//--------------------------------------------------------------
-string omPlayer::getName(){
-	return this->params.name;
-}
-
-//--------------------------------------------------------------
-int omPlayer::getVolumeInt(){
-	return this->params.volume;
-}
-
-int omPlayer::getZoom(){
-	return this->params.zoom;
-}
-
-int omPlayer::getBlur(){
-	return this->params.blur;
-}
-
-//--------------------------------------------------------------
-bool omPlayer::isMuted(){
-	return params.mute;
-}
-
-//--------------------------------------------------------------
-bool omPlayer::isLoop(){
-	return (this->settings.enableLooping || this->enableLoopingList);
-}
-
 //--------------------------------------------------------------
 int omPlayer::getCurrentFrameNbr(){
 	return (this->getCurrentFrame() % this->getTotalNumFrames());
@@ -389,22 +243,12 @@ int omPlayer::getPositionMs(){
 
 //--------------------------------------------------------------
 int omPlayer::getDurationMs(){
-	return static_cast<int>(this->getDuration()*1000);
+	return static_cast<int>(this->getDurationInSeconds()*1000);
 }
 
 //--------------------------------------------------------------
 int omPlayer::timeToFrameMs(int timemilli){
 	int frame = static_cast<int>(timemilli * this->getTotalNumFrames() / this->getDurationMs());
 	return (frame % this->getTotalNumFrames());
-}
-
-//--------------------------------------------------------------
-int omPlayer::playlistSize(){
-	return videoFiles.size();
-}
-
-//--------------------------------------------------------------
-string omPlayer::getFile(){
-	return this->settings.videoPath;
 }
 

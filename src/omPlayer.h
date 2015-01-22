@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofxOMXPlayer.h"
+#include "ofxOMXPlayerListener.h"
 
 struct dims_t {
 	int height;
@@ -10,12 +11,17 @@ struct dims_t {
 };
 
 struct params_t {
-	string 	name;
-	int 	volume;
-	bool 	mute;
-	int 	blur;
-	int 	zoom;
-	
+    int     volume;
+    bool    mute;
+    int     blur;
+    int     zoom;
+};
+
+class omListener
+{
+	public:
+		virtual void onVideoEnd() = 0;
+		virtual void onVideoFreeze() = 0;
 };
 
 class omPlayer : public ofxOMXPlayer 
@@ -24,58 +30,34 @@ class omPlayer : public ofxOMXPlayer
 	public:
 
 		//RUN
+		omPlayer();
 		void init(bool textured, bool audioHDMI);
-		void basepath(string path);
+		void setListener(omListener* myListener);
 
 		void buffer();
 		void display();
 		
-		
-		
 		//CONTROL
-		void load(vector<string> playlist, bool doLoop);
-		void play(vector<string> playlist, bool doLoop);
-		void play(string file, bool doLoop);
-		void play(int index);		
-		void play();
-		
-		void next();
-		void prev();
+		void play(string file);
+		void stop();
 		void pause();
 		void resume();
-		void stop();
+		
 		void seek(int timemilli);
 		
-		void setName(string name);
-		void volume();
 		void volume(int v);
-		void applyVolume();
 		void setMuted(bool mute);
-		void setLoop(bool doLoop);
 		void setBlur(int blur);
 		void setZoom(int zoom);
 		
-		
 		//STATE
-		string 	getName();
-		int  	getVolumeInt();
-		int 	getBlur();
-		int 	getZoom();
-		bool 	isMuted();	
-		bool 	isLoop();
 		int 	getCurrentFrameNbr();
 		int 	getPositionMs();
 		int 	getDurationMs();
-		string 	getFile();
-		int		playlistSize();
-
-		int timeToFrameMs(int timemilli);
+		int 	timeToFrameMs(int timemilli);
 		
 	private:
-				
-		//INTERNAL
-		void doplay();
-
+			
 		//APPLY FX
 		void clearscreen();
 		void blur();
@@ -84,16 +66,15 @@ class omPlayer : public ofxOMXPlayer
 		ofShader noshader, blurH, blurV;
 		ofFbo framebuffer, frameblur;				
 					
+		//PARAMS
 		dims_t			dim;
 		params_t		params;	
-		vector<ofFile> 	videoFiles;
-		int				currentIndex;
-		bool			enableLoopingList;
 
-		string basePath;
-		
-		
-		
-		
+		//END DETECT & ANTIFREEZE
+		int lastFrame;
+    	int freeze;
+
+    	//EVENTS
+    	omListener*	listener;
 };
 

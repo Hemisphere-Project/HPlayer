@@ -9,18 +9,17 @@ void HPlayer::setup()
 	//HPLAYER SETTINGS
 	xmlSettings settings("settings.xml");
 
-	playerName = settings.conf_str("system","playerName","HPlayer");	
-	enableInfo = settings.conf_bool("system","enableInfo",true);
+	player.name = settings.conf_str("system","playerName","HPlayer");	
+	player.info = settings.conf_bool("system","enableInfo",true);
 
-	int defaultVolume = settings.conf_int("player","volume",50);
-	bool audioHDMI = settings.conf_bool("player","audioHdmi",false);
-	bool textured = settings.conf_bool("player","textured",true);
-	int defaultZoom = settings.conf_int("player","zoom",100);
-	int defaultBlur = settings.conf_int("player","blur",0);
+	player.volume = settings.conf_int("player","volume",50);
+	player.ahdmi = settings.conf_bool("player","audioHdmi",false);
+	player.textured = settings.conf_bool("player","textured",true);
+	player.zoom = settings.conf_int("player","zoom",100);
+	player.blur = settings.conf_int("player","blur",0);
 
-	string path = "";
-	path = settings.conf_str("media","path","/home/pi/media");
-	bool loop = settings.conf_bool("media","loop",true);
+	player.basepath( settings.conf_str("media","path","/home/pi/media") );
+	player.loop = settings.conf_bool("media","loop",true);
 
 	osc.portIN 	= settings.conf_int("osc","portIn",OSCPORT_IN);
 	osc.portOUT = settings.conf_int("osc","portOut",OSCPORT_OUT);
@@ -29,17 +28,19 @@ void HPlayer::setup()
 	osc.cmdmap = settings.conf_str("osc","commands","default");
 
 	//PLAYER SETTINGS COMMAND LINE
-	if (ofxArgParser::hasKey("name")) playerName = ofxArgParser::getValue("name");
-	if (ofxArgParser::hasKey("info")) enableInfo = (ofToInt(ofxArgParser::getValue("info")) == 1);	
-	if (ofxArgParser::hasKey("volume")) defaultVolume = ofToInt(ofxArgParser::getValue("volume"));
-	if (ofxArgParser::hasKey("ahdmi")) audioHDMI = (ofToInt(ofxArgParser::getValue("ahdmi")) == 1);
-	if (ofxArgParser::hasKey("zoom")) defaultZoom = ofToInt(ofxArgParser::getValue("zoom"));
-	if (ofxArgParser::hasKey("blur")) defaultBlur = ofToInt(ofxArgParser::getValue("blur"));
-	if (ofxArgParser::hasKey("gl")) textured = (ofToInt(ofxArgParser::getValue("gl")) == 1);
+	if (ofxArgParser::hasKey("name")) player.name = ofxArgParser::getValue("name");
+	if (ofxArgParser::hasKey("info")) player.info = (ofToInt(ofxArgParser::getValue("info")) == 1);	
+	if (ofxArgParser::hasKey("volume")) player.volume = ofToInt(ofxArgParser::getValue("volume"));
+	if (ofxArgParser::hasKey("ahdmi")) player.ahdmi = (ofToInt(ofxArgParser::getValue("ahdmi")) == 1);
+	if (ofxArgParser::hasKey("zoom")) player.zoom = ofToInt(ofxArgParser::getValue("zoom"));
+	if (ofxArgParser::hasKey("blur")) player.blur = ofToInt(ofxArgParser::getValue("blur"));
+	if (ofxArgParser::hasKey("gl")) player.textured = (ofToInt(ofxArgParser::getValue("gl")) == 1);
 
 	//COMMAND WITH MEDIA PATH
-	if (ofxArgParser::hasKey("media")) path = ofxArgParser::getValue("media");
-	if (ofxArgParser::hasKey("loop")) loop = (ofToInt(ofxArgParser::getValue("loop")) == 1);
+	if (ofxArgParser::hasKey("path")) player.basepath( ofxArgParser::getValue("path") );
+	string media = "";
+	if (ofxArgParser::hasKey("media")) media = ofxArgParser::getValue("media");
+	if (ofxArgParser::hasKey("loop")) player.loop = (ofToInt(ofxArgParser::getValue("loop")) == 1);
 
 	//SETTINGS OSC COMMAND LINE
 	if (ofxArgParser::hasKey("in")) osc.portIN = ofToInt(ofxArgParser::getValue("in"));
@@ -49,29 +50,21 @@ void HPlayer::setup()
 	if (ofxArgParser::hasKey("cmdmap")) osc.cmdmap = ofxArgParser::getValue("cmdmap");	
 
 	//INIT PLAYER
-	player.init(textured,audioHDMI);
-	player.setName(playerName);	
-	player.basepath(path);
-	player.volume(defaultVolume);
-	player.setZoom(defaultZoom);
-	player.setBlur(defaultBlur);
-	lastFrame = 0;
-	freeze = 0;
+	player.init();
 
 	//CONNECT OSC
 	osc.connect();
 
 	//AUTOSTART
-	/*if (path != "")
+	if (media != "")
 	{
 		vector<string> playlist;		
-		playlist.push_back(path);
-		player.play( playlist, loop);
-	}*/
+		playlist.push_back(media);
+		player.play(playlist);
+	}
 	
 	//SEND STATUS
 	osc.status(&player);
-
 }
 
 
@@ -82,94 +75,17 @@ void HPlayer::update()
 	//EXECUTE RECEIVED OSC COMMANDS
 	osc.execute(&player);
 	
-	//BUFFER FRAME
-	player.buffer();
-	
-	//TODO BRING THAT IN THE uxOMX
-	//DETECT END / LOOP since Listener in ofxOMX are broken
-	if (player.isPlaying()) 
-	{
-		int maxFrame = player.getTotalNumFrames()-1;
-		int currentFrame = player.getCurrentFrameNbr();
-		
-		//FILE REACH THE END
-		if ((currentFrame == maxFrame) and (lastFrame < maxFrame)) 
-		{			
-			player.next(); 
-			osc.status(&player); //TODO Create event statut change
-		}		
-		
-		//FREEZE detection (due to wrong frame counter)
-		if ((currentFrame == lastFrame) && (!player.isPaused())) 
-		{
-			freeze++;
-			if (freeze > 10) player.next();
-		}
-		else freeze = 0;
-		
-			
-		lastFrame = currentFrame;
-	}
-	else lastFrame = 0;
-	
+	//PLAYER UPDATE
+	player.update();
 }
 
 //--------------------------------------------------------------
-void HPlayer::draw(){
-	
-	player.display();
-	
-	//STANDBY MESSAGE
-	if (!player.isPlaying()) this->displayStandby();
-	
-	//DEBUG INFO DISPLAY
-	if (enableInfo) this->displayInfo();
+void HPlayer::draw()
+{
+	//PLAYER DRAW
+	player.draw();
 }
 
-
-
-//--------------------------------------------------------------
-void HPlayer::displayInfo() {
-
-	stringstream info;
-	info << "- HPLAYER INFO -\n";
-	
-	info <<"\n" << player.getName();
-	info <<"\n" << ofToString(ofGetFrameRate()) + "FPS";
-	
-	info <<"\n";
-	if (player.isPlaying()) info << "PLAYING" ;
-	else  info << "STOPPED";
-	if (player.isPaused()) info<<"\n" << " - PAUSED";
-	info <<"\n";
-	if (player.isOpen) info << "OPENED" ;
-	else  info << "CLOSED";
-
-	info <<"\n" <<	"VOL " << player.getVolumeInt();
-	info <<"\n";
-	info <<"\n" <<	ofGetWidth()<<"x"<<ofGetHeight();
-	
-	if (player.isOpen)
-	{
-		info <<"\n" <<	player.getWidth()<<"x"<<player.getHeight();
-		info <<"\n" <<	ofToString(player.getPositionMs()) << " / " << ofToString(player.getDurationMs());	
-		info <<"\n" <<	player.getCurrentFrameNbr() << " / " << player.getTotalNumFrames();	
-	}
-	info <<"\n";
-	info <<"\n" << osc.log();
-
-	ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);
-	
-}
-
-//--------------------------------------------------------------
-void HPlayer::displayStandby() {
-
-	stringstream info;
-	info << " .:: "<<player.getName()<<" ::. ";
-	ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);
-	
-}
 
 
 //--------------------------------------------------------------

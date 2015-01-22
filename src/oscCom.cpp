@@ -52,7 +52,7 @@ string oscCom::cmd(string command)
 	return commander.getValue(command,command);
 }
 
-void oscCom::execute(omPlayer* player)
+void oscCom::execute(mediaPlayer* player)
 {
 	if (!connected) return;
 	if (oscListener.hasWaitingMessages()) oscDebug = "";
@@ -66,13 +66,11 @@ void oscCom::execute(omPlayer* player)
         vector<string> address = ofSplitString(m.getAddress(),"/");
    		string command = address[1];
    		if (command == "*") command = address[2];
-		  	
+
 	  	if ((command == cmd("play")) or (command == cmd("playloop")) or (command == cmd("load")))
 		{			
 			vector<string> playlist;
 			string filepath;
-			
-			bool doLoop = (command == cmd("playloop"));
 			
 			for(int k = 0; k < m.getNumArgs(); k++)
 				if ((m.getArgType(k) == OFXOSC_TYPE_STRING) && (m.getArgAsString(k) != "")) 
@@ -80,10 +78,12 @@ void oscCom::execute(omPlayer* player)
 					filepath = m.getArgAsString(k);
 					if (base64) filepath = ofxCrypto::base64_decode(filepath);	
 								
-					playlist.push_back(filepath);
+					playlist.push_back(filepath);		
 				}
-			
-			if (m.getNumArgs() > 0) player->load(playlist,doLoop);
+
+			if (command == cmd("playloop")) player->loop = true;
+			if (playlist.size() > 0) player->load(playlist);
+			else player->load();
 			if (command != cmd("load")) player->play();							
 		}
 		else if(command == cmd("stop"))
@@ -112,41 +112,42 @@ void oscCom::execute(omPlayer* player)
 		}			
 		else if(command == cmd("volume"))
 		{
-			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->volume(m.getArgAsInt32(0));
+			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->volume = m.getArgAsInt32(0);
+			else if(m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->volume = (int) m.getArgAsFloat(0);
 		}
 		else if(command == cmd("mute"))
 		{
 			bool doMute = true;
 			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_INT32)) doMute = (m.getArgAsInt32(0) == 1);
 		
-			player->setMuted(doMute);
+			player->mute = doMute;
 		}
 		else if(command == cmd("unmute"))
 		{
-			player->setMuted(false);
+			player->mute = false;
 		}
 		else if(command == cmd("loop"))
 		{
 			bool doLoop = true;
 			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_INT32)) doLoop = (m.getArgAsInt32(0) == 1);
 		
-			player->setLoop(doLoop);
+			player->loop = doLoop;
 		}
 		else if(command == cmd("unloop"))
 		{
-			player->setLoop(false);
+			player->loop = false;
 		}
 		else if(command == cmd("blur"))
 		{
-			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->setBlur(m.getArgAsInt32(0));
+			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->blur = m.getArgAsInt32(0);
 		}
 		else if(command == cmd("zoom"))
 		{
-			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->setZoom(m.getArgAsInt32(0));
+			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->zoom = m.getArgAsInt32(0);
 		}			
 		else if(command == cmd("info"))
 		{
-			//enableInfo = !enableInfo;
+			player->info = !player->info;
 		}
 		else if(command == cmd("host"))
 		{
@@ -159,7 +160,7 @@ void oscCom::execute(omPlayer* player)
 		else if(command == cmd("quit"))
 		{
 			ofLog(OF_LOG_NOTICE,"-HP- QUIT ");
-			player->close();
+			player->stop();
 			std::exit(0);
 		}
 		//KXKM regie
@@ -170,9 +171,10 @@ void oscCom::execute(omPlayer* player)
 		else if(command == cmd("fullsynctest"))
 		{
 			this->ipKXKM(player);
-		}	
+		}
 		
 		oscDebug += this->oscToString(m)+"\n";
+		//ofLog(OF_LOG_NOTICE,"-HP- OSC "+oscDebug);
     }	
 }
 
@@ -197,15 +199,15 @@ string oscCom::oscToString(ofxOscMessage m) {
 	return message;
 }
 
-void oscCom::status(omPlayer* player) 
+void oscCom::status(mediaPlayer* player) 
 {
 	if (!connected) return;
 	
 	ofxOscMessage m;
 	m.setAddress("/status");
-	m.addStringArg(player->getName());
+	m.addStringArg(player->name);
 	
-	string filepath = player->getFile();
+	string filepath = player->media();
 	if (base64) filepath = ofxCrypto::base64_encode(filepath);
 	
 	if (player->isPlaying())
@@ -216,7 +218,7 @@ void oscCom::status(omPlayer* player)
 		m.addStringArg(filepath);
 		m.addIntArg(player->getPositionMs());
 		m.addIntArg(player->getDurationMs());
-		m.addIntArg( (player->isLoop()) ? 1 : 0 );
+		m.addIntArg( (player->loop) ? 1 : 0 );
 	}
 	else 
 	{
@@ -224,16 +226,16 @@ void oscCom::status(omPlayer* player)
 		m.addStringArg(filepath);
 		m.addIntArg(0);
 		m.addIntArg(player->getDurationMs());
-		m.addIntArg( (player->isLoop()) ? 1 : 0 );
+		m.addIntArg( (player->loop) ? 1 : 0 );
 	}
 	
-	m.addIntArg(player->getVolumeInt());
+	m.addIntArg(player->volume);
 	
-	if (player->isMuted()) m.addStringArg("muted");
+	if (player->mute) m.addStringArg("muted");
 	else m.addStringArg("unmuted");
 	
-	m.addIntArg(player->getZoom());
-	m.addIntArg(player->getBlur());
+	m.addIntArg(player->zoom);
+	m.addIntArg(player->blur);
 	
 	oscSender.sendMessage(m);
 }
@@ -263,15 +265,15 @@ char* oscCom::getIP()
 
 
 //KXKM centralized control specific
-void oscCom::statusKXKM(omPlayer* player) 
+void oscCom::statusKXKM(mediaPlayer* player) 
 {
 	if (!connected) return;
 	
 	ofxOscMessage m;
-	m.setAddress("/"+player->getName());
+	m.setAddress("/"+player->name);
 
 	m.addStringArg("auto");  //auto or manu => external state ctrl
-	m.addStringArg( (player->isLoop()) ? "loop" : "unloop" );
+	m.addStringArg( (player->loop) ? "loop" : "unloop" );
 	m.addStringArg("screen"); //screen or noscreen
 	//m.addStringArg("normal"); //normal or faded
 	
@@ -279,19 +281,19 @@ void oscCom::statusKXKM(omPlayer* player)
 	if (player->isPlaying())
 	{
 		m.addStringArg("playmovie");
-		m.addStringArg(ofFilePath::getFileName(player->getFile()));
+		m.addStringArg(ofFilePath::getFileName(player->media()));
 	}
 	else m.addStringArg("stopmovie");
 	
 	oscSender.sendMessage(m);
 }
 
-void oscCom::ipKXKM(omPlayer* player) 
+void oscCom::ipKXKM(mediaPlayer* player) 
 {
 	if (!connected) return;
 	
 	ofxOscMessage m;
-	m.setAddress("/"+player->getName());
+	m.setAddress("/"+player->name);
 
 	m.addStringArg("initinfo"); 
 	m.addStringArg(this->getIP());

@@ -1,6 +1,6 @@
 #pragma once
 #include "ofxOsc.h"
-#include "omPlayer.h"
+#include "mediaPlayer.h"
 #include "ofxCrypto.h"
 #include "xmlSettings.h"
 
@@ -20,16 +20,16 @@ class oscCom
 		char* getIP();
 		
 		//RECEIVE
-		void 	execute(omPlayer* player);
+		void 	execute(mediaPlayer* player);
 		string	log();
 		string 	oscToString(ofxOscMessage m);
 		
 		//SEND	
-		void 	status(omPlayer* player);
+		void 	status(mediaPlayer* player);
 		void 	end(string file);
 
-		void statusKXKM(omPlayer* player);
-		void ipKXKM(omPlayer* player);
+		void statusKXKM(mediaPlayer* player);
+		void ipKXKM(mediaPlayer* player);
 		
 		//SETTINGS
 		int 	portIN;

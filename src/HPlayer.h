@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "omPlayer.h"
+#include "mediaPlayer.h"
 #include "ofxCrypto.h"
 #include "ofxArgParser.h"
 #include "xmlSettings.h"
@@ -23,26 +23,15 @@ class HPlayer : public ofBaseApp
 		void keyPressed(int key);
 	
 	private:
-	
-		//HPLAYER
-		string playerName;
-		bool	enableInfo;	
-	
+
 		//PLAYER
-		omPlayer player;	
-		int 	lastFrame;
-		int		freeze;
+		mediaPlayer player;	
 		
 		//OSC
 		oscCom	osc;
-		
-		//DISPLAY TOOLS
-		void 	displayInfo();
-		void 	displayStandby();
 
 		//EVENTS
 		char eventString[255];
-		
-		
+				
 };
 
