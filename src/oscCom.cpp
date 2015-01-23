@@ -140,10 +140,12 @@ void oscCom::execute(mediaPlayer* player)
 		else if(command == cmd("blur"))
 		{
 			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->blur = m.getArgAsInt32(0);
+			else if(m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->blur = (int) m.getArgAsFloat(0);
 		}
 		else if(command == cmd("zoom"))
 		{
 			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->zoom = m.getArgAsInt32(0);
+			else if(m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->zoom = (int) m.getArgAsFloat(0);
 		}			
 		else if(command == cmd("info"))
 		{

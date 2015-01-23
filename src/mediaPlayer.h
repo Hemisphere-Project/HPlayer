@@ -78,5 +78,7 @@ class mediaPlayer : public omListener {
         
         vector<ofFile>  mediaFiles;
         int             currentIndex;
+        int             nextIndex;
+
 
 };

@@ -15,6 +15,10 @@ mediaPlayer::mediaPlayer()
     this->zoom    = 100;
     this->blur    = 0;
 
+    //MEDIA
+    this->currentIndex = 0;
+    this->nextIndex = 0;
+
     video = new omPlayer();
 }
 
@@ -36,20 +40,27 @@ void mediaPlayer::basepath(string path)
 //-------------------------------------------------------------
 void mediaPlayer::update()
 {
+    //CHANGE MEDIA
+    if (this->nextIndex != this->currentIndex)
+    {
+        if (this->nextIndex >= this->playlistSize() && this->loop) this->nextIndex = 0;
+        else if (this->nextIndex < 0 && this->loop) this->nextIndex = (this->playlistSize()-1);
+        this->play(this->nextIndex);
+        this->nextIndex = this->currentIndex;
+    }
+
     //VIDEO
     video->volume(this->volume);
     video->setMuted(this->mute);
     video->setZoom(this->zoom);
     video->setBlur(this->blur);
-
-    video->buffer();
 }
 
 //-------------------------------------------------------------
 void mediaPlayer::draw()
 {
     //VIDEO
-    video->display();
+    video->show();
 
     //MESSAGE
     if (!isPlaying()) this->displayStandby();
@@ -100,16 +111,8 @@ int mediaPlayer::playlistSize(){
 void mediaPlayer::play(vector<string> playlist)
 {   
     this->load(playlist);
-
-    //NO FILES IN THE LIST: DO NOTHING
-    if (this->playlistSize() == 0) 
-    {
-        this->stop();
-        return;
-    }
-    
-    //START PLAY AT 0
-    this->play(0);
+    if (this->playlistSize() > 0) this->play(0);
+    else this->stop();
 }
 
 /*PLAY FILE*/
@@ -125,7 +128,7 @@ void mediaPlayer::play(string file)
 //--------------------------------------------------------------
 void mediaPlayer::play(){
         
-    if (playlistSize() > 0) this->play(0);
+    if (this->playlistSize() > 0) this->play(0);
 }
 
 /*PLAY FILE AT INDEX IN THE LIST*/
@@ -137,7 +140,12 @@ void mediaPlayer::play(int index)
         this->currentIndex = index;
     
         //VIDEO
-        video->play( mediaFiles[this->currentIndex].path());
+        video->play( mediaFiles[this->currentIndex].path() );
+    }
+    else 
+    {
+        this->stop();
+        this->currentIndex = 0;
     }
 }
 
@@ -146,14 +154,7 @@ void mediaPlayer::play(int index)
 //--------------------------------------------------------------
 void mediaPlayer::next()
 {    
-    //playlist
-    int index = this->currentIndex+1;
-    if (index >= this->playlistSize()) 
-    {
-        if (this->loop) this->play(0);
-        else this->stop();
-    }
-    else this->play(index);
+    this->nextIndex = this->currentIndex+1;
 }
 
 void mediaPlayer::onVideoEnd()
@@ -171,13 +172,7 @@ void mediaPlayer::onVideoFreeze()
 //--------------------------------------------------------------
 void mediaPlayer::prev()
 {    
-    int index = this->currentIndex-1;
-    if (index < 0) 
-    {
-        if (this->loop) this->play((this->playlistSize()-1));
-        else this->stop();
-    }
-    else this->play(index);
+    this->nextIndex = this->currentIndex-1;
 }
 
 
@@ -206,8 +201,8 @@ void mediaPlayer::resume(){
 //--------------------------------------------------------------
 void mediaPlayer::seek(int timemilli){
         
-    //int frame = this->timeToFrameMs(timemilli);
-    //TODO
+    //VIDEO
+    video->seek(timemilli);
 }
 
 //--------------------------------------------------------------

@@ -36,6 +36,7 @@ class omPlayer : public ofxOMXPlayer
 
 		void buffer();
 		void display();
+		void show();
 		
 		//CONTROL
 		void play(string file);
@@ -58,8 +59,13 @@ class omPlayer : public ofxOMXPlayer
 		
 	private:
 			
-		//APPLY FX
+		//DISPLAY LOGICS
+		void applyVolume();
+		void iceAxe();
+		void makeRect();
 		void clearscreen();
+		
+		//FX
 		void blur();
 		
 		//BUFFER & SHADER

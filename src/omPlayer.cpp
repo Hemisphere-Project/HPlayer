@@ -48,58 +48,45 @@ void omPlayer::setListener(omListener* myListener)
 	this->listener = myListener;
 }
 
-void omPlayer::buffer()
-{	
-//RETURN IF NOT PLAYING
-	if (!this->isPlaying()) 
-	{
-		lastFrame = 0;
-		return;
-	}
-
-//DETECT END / LOOP since Listener in ofxOMX are broken
-	int maxFrame = getTotalNumFrames()-1;
-	int currentFrame = getCurrentFrameNbr();	
-	//FILE REACH THE END
-	if ((currentFrame == maxFrame) and (lastFrame < maxFrame)) 
-	{
-		if (this->listener != NULL) listener->onVideoEnd();
-		//ofNotifyEvent(onPlaybackReachEnd,1);
-	}
-	//FREEZE detection (due to wrong frame counter)
-	if ((currentFrame == lastFrame) && (!this->isPaused())) 
-	{
-		freeze++;
-		if (freeze > 10) 
-		{
-			if (this->listener != NULL) listener->onVideoFreeze();
-			//ofNotifyEvent(onPlaybackFreeze,1);
-		}
-	}
-	else freeze = 0;		
-	lastFrame = currentFrame;
-
-
-//APPLY VOLUME CHANGES
+void omPlayer::applyVolume()
+{
+	//APPLY VOLUME CHANGES
 	float v;
 	if (params.mute) v = 0.0;
 	else v = params.volume/100.0;
-	
 	if (v != settings.initialVolume) 
 	{
 		settings.initialVolume = v;
 		this->setVolume(settings.initialVolume);
 	}
-	
-//IF NO VIDEO FLUX // DO NOTHING
-	if (!this->isTextureEnabled()) return;
-	if (!((this->getHeight() > 0) and (this->getWidth() > 0))) return;
-	
-//WIDTH
+}
+
+void omPlayer::iceAxe()
+{
+	//DETECT END / LOOP since Listener in ofxOMX are broken
+	int maxFrame = getTotalNumFrames()-1;
+	int currentFrame = getCurrentFrameNbr();	
+	if (this->listener != NULL)
+	{
+		//FILE REACH THE END
+		if ((currentFrame == maxFrame) and (lastFrame < maxFrame)) listener->onVideoEnd();
+		//FREEZE detection (due to wrong frame counter)
+		if ((currentFrame == lastFrame) && (!this->isPaused())) 
+		{
+			if (freeze++ > 10)  listener->onVideoFreeze();
+		}
+		else freeze = 0;
+	}
+	lastFrame = currentFrame;
+}
+
+void omPlayer::makeRect()
+{
+	//WIDTH
 	dim.width = floor( ofGetHeight() * this->getWidth() / this->getHeight() ); //WIDTH RATIO FROM MAXIMIZED HEIGHT
 	if (dim.width > ofGetWidth()) dim.width = ofGetWidth(); //SHRINK IF WIDTH IS TO BIG
 	
-//ZOOM
+	//ZOOM
 	if (params.zoom != 100)
 	{
 		dim.width = floor( dim.width * params.zoom / 100. ); //APPLY ZOOM
@@ -107,34 +94,48 @@ void omPlayer::buffer()
 	}
 	if (!(dim.width > 0)) return;
 	
-//HEIGHT 
+	//HEIGHT 
 	dim.height = floor( dim.width * this->getHeight() / this->getWidth() ); //KEEP ASPECT RATIO
 	if (!(dim.height > 0)) return;
 	
-//MARGINS
+	//MARGINS
 	dim.marginX = floor((ofGetWidth()-dim.width)/2);
 	dim.marginY = floor((ofGetHeight()-dim.height)/2);
+}
+
+void omPlayer::show()
+{
+	//APPLY NEW VOLUME / MUTE
+	this->applyVolume();
+
+	//CHECK IF PLAYING
+	if (!this->isPlaying()) return;
+
+	//ANTI FREEZE
+	this->iceAxe();
 	
-//CLEAR BUFFER
+	//CHECK IF TEXTURE MODE ENABLED AND VALID
+	if(!this->isTextureEnabled()) return;
+	if (!((this->getHeight() > 0) and (this->getWidth() > 0))) return;
+
+	//CALCULATE DIMS
+	this->makeRect();
+
+	//CLEAR BUFFER
 	this->clearscreen();
-	
-//RENDER TO FRAMEBUFFER (WITH BYPASSED SHADER)
+
+	//FILL BUFFER
 	framebuffer.begin();
-		noshader.begin();
-			noshader.setUniformTexture("tex0", this->getTextureReference(), this->getTextureID());
-			this->draw(this->dim.marginX, this->dim.marginY, this->dim.width, this->dim.height);
-		noshader.end();		
+		this->draw(this->dim.marginX, this->dim.marginY, this->dim.width, this->dim.height);
 	framebuffer.end();
 
-//BLUR
+	//BLUR
 	if (params.blur > 0) this->blur();	
 
+	//DRAW TO SCREEN
+	framebuffer.draw(0, 0);
 }
 
-void omPlayer::display()
-{
-	if (this->isTextureEnabled()) framebuffer.draw(0, 0);
-}
 
 void omPlayer::clearscreen()
 {
@@ -174,12 +175,11 @@ void omPlayer::blur()
 //--------------------------------------------------------------
 void omPlayer::play(string file){
 		
-	if (this->isPlaying()) this->stop(); 
+	/*if (this->isPlaying()) this->stop(); 
 	this->settings.videoPath = file;
 	this->setup(this->settings);
-
-	//this->loadMovie(file);
-
+	*/
+	this->loadMovie(file);
 	this->setPaused(false);	
 }
 
@@ -187,7 +187,7 @@ void omPlayer::play(string file){
 //--------------------------------------------------------------
 void omPlayer::seek(int timemilli){
 		
-	int frame = this->timeToFrameMs(timemilli);
+	//int frame = this->timeToFrameMs(timemilli);
 	//TODO
 }
 
