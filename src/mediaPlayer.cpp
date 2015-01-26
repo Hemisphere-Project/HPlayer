@@ -106,6 +106,7 @@ void mediaPlayer::load(vector<string> playlist)
         else if (file.isDirectory())
         {
             ofDirectory dir(playlist[k]);
+            dir.sort();
             dir.listDir();
             for(int j = 0; j < dir.size(); j++)
                 if (dir.getFile(j).isFile()) list.push_back(dir.getFile(j));
@@ -188,11 +189,7 @@ void mediaPlayer::play(int index)
             image->play( file.path() );
         }
     }
-    else 
-    {
-        this->stop();
-        this->currentIndex = 0;
-    }
+    else  this->stop();
 }
 
 
@@ -239,6 +236,8 @@ void mediaPlayer::stop()
     video->stop();
     sound->stop();
     image->stop();
+    this->currentIndex = 0;
+    this->nextIndex = 0;
 }
 
 //--------------------------------------------------------------

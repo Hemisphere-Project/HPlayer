@@ -25,6 +25,7 @@ void HPlayer::setup()
 	osc.portOUT = settings.conf_int("osc","portOut",OSCPORT_OUT);
 	osc.hostOUT = settings.conf_str("osc","hostOut",OSCHOST_OUT);
 	osc.base64 = settings.conf_bool("osc","base64",false);
+	osc.prefix = settings.conf_str("osc","prefix","");
 	osc.cmdmap = settings.conf_str("osc","commands","default");
 
 	//PLAYER SETTINGS COMMAND LINE
@@ -50,6 +51,7 @@ void HPlayer::setup()
 	if (ofxArgParser::hasKey("host")) osc.hostOUT = ofxArgParser::getValue("host");	
 	if (ofxArgParser::hasKey("base64")) osc.base64 = (ofToInt(ofxArgParser::getValue("base64")) == 1);
 	if (ofxArgParser::hasKey("cmdmap")) osc.cmdmap = ofxArgParser::getValue("cmdmap");	
+	if (ofxArgParser::hasKey("prefix")) osc.prefix = ofxArgParser::getValue("prefix");	
 
 	//INIT PLAYER
 	player.init();

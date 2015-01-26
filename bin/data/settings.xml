@@ -19,6 +19,7 @@
     <hostOut>localhost</hostOut>
     <base64>0</base64>
     <commands>default</commands>
+    <prefix />
 </osc>
 <commands>
     <default>

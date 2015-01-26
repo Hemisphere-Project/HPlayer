@@ -26,6 +26,7 @@ class oscCom
 		
 		//SEND	
 		void 	status(mediaPlayer* player);
+		void 	status(mediaPlayer* player, string postman);
 		void 	end(string file);
 
 		void statusKXKM(mediaPlayer* player);
@@ -37,6 +38,7 @@ class oscCom
 		string 	hostOUT;
 		bool 	base64;
 		string 	cmdmap;
+		string  prefix;
 		
 		
 	private:

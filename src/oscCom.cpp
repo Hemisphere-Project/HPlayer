@@ -10,6 +10,7 @@ oscCom::oscCom()
 	hostOUT = "localhost";
 	base64 = false;
 	cmdmap = "default";
+	prefix = "";
 }
 
 void oscCom::connect()
@@ -65,7 +66,12 @@ void oscCom::execute(mediaPlayer* player)
 
         vector<string> address = ofSplitString(m.getAddress(),"/");
    		string command = address[1];
-   		if (command == "*") command = address[2];
+   		string postman = "";
+   		if (ofIsStringInString(command, ":") or command == "*")
+   		{
+   			postman = command;
+   			command = address[2];
+   		}
 
 	  	if ((command == cmd("play")) or (command == cmd("playloop")) or (command == cmd("load")))
 		{			
@@ -157,7 +163,7 @@ void oscCom::execute(mediaPlayer* player)
 		}
 		else if(command == cmd("getStatus"))
 		{
-			this->status(player);
+			this->status(player,postman);
 		}				
 		else if(command == cmd("quit"))
 		{
@@ -165,6 +171,7 @@ void oscCom::execute(mediaPlayer* player)
 			player->stop();
 			std::exit(0);
 		}
+
 		//KXKM regie
 		else if(command == cmd("synctest"))
 		{
@@ -201,12 +208,19 @@ string oscCom::oscToString(ofxOscMessage m) {
 	return message;
 }
 
-void oscCom::status(mediaPlayer* player) 
+void oscCom::status(mediaPlayer* player)
+{
+	this->status(player, this->prefix);
+}
+
+void oscCom::status(mediaPlayer* player, string postman) 
 {
 	if (!connected) return;
 	
 	ofxOscMessage m;
-	m.setAddress("/status");
+	if (postman != "") m.setAddress("/"+postman+"/status");
+	else m.setAddress("/status");
+
 	m.addStringArg(player->name);
 	
 	string filepath = player->media();
@@ -247,7 +261,8 @@ void oscCom::end(string file)
 	if (!connected) return;
 	
 	ofxOscMessage m;
-	m.setAddress("/end");
+	if (this->prefix != "") m.setAddress("/"+this->prefix+"/end");
+	else m.setAddress("/end");
 	m.addStringArg(file);
 	oscSender.sendMessage(m);
 }
