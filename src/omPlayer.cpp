@@ -61,7 +61,7 @@ void omPlayer::applyVolume()
 	}
 }
 
-void omPlayer::iceAxe()
+void omPlayer::iceBreak()
 {
 	//DETECT END / LOOP since Listener in ofxOMX are broken
 	int maxFrame = getTotalNumFrames()-1;
@@ -112,7 +112,7 @@ void omPlayer::show()
 	if (!this->isPlaying()) return;
 
 	//ANTI FREEZE
-	this->iceAxe();
+	this->iceBreak();
 	
 	//CHECK IF TEXTURE MODE ENABLED AND VALID
 	if(!this->isTextureEnabled()) return;
@@ -187,6 +187,7 @@ void omPlayer::play(string file){
 //--------------------------------------------------------------
 void omPlayer::seek(int timemilli){
 		
+	//if (this->isPlaying())
 	//int frame = this->timeToFrameMs(timemilli);
 	//TODO
 }
@@ -201,12 +202,12 @@ void omPlayer::stop()
 
 //--------------------------------------------------------------
 void omPlayer::pause(){
-	this->setPaused(true);
+	if (this->isPlaying()) this->setPaused(true);
 }
 
 //--------------------------------------------------------------
 void omPlayer::resume(){
-	this->setPaused(false);
+	if (this->isPlaying()) this->setPaused(false);
 }
 
 //--------------------------------------------------------------

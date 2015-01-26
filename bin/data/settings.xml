@@ -6,8 +6,8 @@
     <volume>50</volume>
     <audioHdmi>0</audioHdmi>
     <textured>1</textured>
-    <zoom>50</zoom>
-    <blur>100</blur>
+    <zoom>100</zoom>
+    <blur>0</blur>
 </player>
 <media>
     <path>/home/pi/media</path>

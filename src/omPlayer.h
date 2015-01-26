@@ -61,7 +61,7 @@ class omPlayer : public ofxOMXPlayer
 			
 		//DISPLAY LOGICS
 		void applyVolume();
-		void iceAxe();
+		void iceBreak();
 		void makeRect();
 		void clearscreen();
 		

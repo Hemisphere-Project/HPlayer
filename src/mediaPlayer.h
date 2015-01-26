@@ -1,9 +1,10 @@
 #pragma once
 #include "omPlayer.h"
-//#include "sndPlayer.h"
+#include "sndPlayer.h"
 //#include "imgPlayer.h"
 
-class mediaPlayer : public omListener {
+class mediaPlayer : public omListener, public sndListener 
+{
 
     public:
 
@@ -46,6 +47,8 @@ class mediaPlayer : public omListener {
         //EVENTS LISTENER
         void onVideoEnd();
         void onVideoFreeze();
+        void onSoundEnd();
+        void onSoundFreeze();
 
         //INFO
         string media();
@@ -68,8 +71,8 @@ class mediaPlayer : public omListener {
         
     private:
                 
+        sndPlayer* sound;
         omPlayer* video;
-        //sndPlayer sound;
         //imgPlayer image;
 
         string  basePath;

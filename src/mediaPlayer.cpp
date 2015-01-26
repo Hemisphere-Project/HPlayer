@@ -19,6 +19,10 @@ mediaPlayer::mediaPlayer()
     this->currentIndex = 0;
     this->nextIndex = 0;
 
+    //SOUND
+    sound = new sndPlayer();
+
+    //VIDEO
     video = new omPlayer();
 }
 
@@ -28,6 +32,9 @@ void mediaPlayer::init()
     //VIDEO
     video->init(textured, ahdmi);
     video->setListener(this);
+
+    //SOUND
+    sound->setListener(this);
 }
 
 //-------------------------------------------------------------
@@ -54,6 +61,11 @@ void mediaPlayer::update()
     video->setMuted(this->mute);
     video->setZoom(this->zoom);
     video->setBlur(this->blur);
+
+    //SOUND
+    sound->volume(this->volume);
+    sound->setMuted(this->mute);
+    sound->run();
 }
 
 //-------------------------------------------------------------
@@ -139,8 +151,19 @@ void mediaPlayer::play(int index)
     {
         this->currentIndex = index;
     
+        ofFile file = mediaFiles[this->currentIndex];
+
         //VIDEO
-        video->play( mediaFiles[this->currentIndex].path() );
+        if (file.getExtension() == "mp4" or file.getExtension() == "mov" or file.getExtension() == "avi")
+        { 
+            sound->stop();
+            video->play( file.path() );
+        }
+        else if (file.getExtension() == "wav" or file.getExtension() == "mp3" or file.getExtension() == "aif" or file.getExtension() == "ogg")
+        {
+            video->stop();
+            sound->play( file.path() );
+        }
     }
     else 
     {
@@ -167,6 +190,16 @@ void mediaPlayer::onVideoFreeze()
     this->next();
 }
 
+void mediaPlayer::onSoundEnd()
+{
+    this->next();
+}
+
+void mediaPlayer::onSoundFreeze()
+{
+    this->next();
+}
+
 
 /*PLAY PREVIOUS FILE IN THE LIST*/
 //--------------------------------------------------------------
@@ -179,44 +212,49 @@ void mediaPlayer::prev()
 //--------------------------------------------------------------
 void mediaPlayer::stop()
 {
-    //VIDEO    
+    //VIDEO & SOUND    
     video->stop();
+    sound->stop();
 }
 
 //--------------------------------------------------------------
 void mediaPlayer::pause(){
     
-    //VIDEO
+    //VIDEO & SOUND
     video->pause();
+    sound->pause();
 }
 
 //--------------------------------------------------------------
 void mediaPlayer::resume(){
     
-    //VIDEO
+    //VIDEO & SOUND
     video->resume();
+    sound->resume();
 }
 
 /*SEEK TO TIME MILLISECONDS*/
 //--------------------------------------------------------------
 void mediaPlayer::seek(int timemilli){
         
-    //VIDEO
+    //VIDEO & SOUND
     video->seek(timemilli);
+    sound->seek(timemilli);
 }
 
 //--------------------------------------------------------------
 bool mediaPlayer::isPlaying()
 {
-    //VIDEO
-    return video->isPlaying();
+    //VIDEO & SOUND
+    return (video->isPlaying() or sound->isPlaying());
 }
 
 //--------------------------------------------------------------
 bool mediaPlayer::isPaused()
 {
-    //VIDEO
+    //VIDEO & SOUND
     if (video->isPlaying()) return video->isPaused();
+    else if (sound->isPlaying()) return sound->isPaused();
     return false;
 }
 
@@ -230,16 +268,16 @@ string mediaPlayer::media()
 //--------------------------------------------------------------
 int mediaPlayer::getPositionMs()
 {
-    //VIDEO
     if (video->isPlaying()) return video->getPositionMs();
+    else if (sound->isPlaying()) return sound->getPositionMs();
     return 0;
 }
 
 //--------------------------------------------------------------
 int mediaPlayer::getDurationMs()
 {
-    //VIDEO
     if (video->isPlaying()) return video->getDurationMs();
+    else if (sound->isPlaying()) return sound->getDurationMs();
     return 0;
 }
 
@@ -262,12 +300,18 @@ void mediaPlayer::displayInfo() {
     info <<"\n";
     info <<"\n" <<  ofGetWidth()<<"x"<<ofGetHeight();
     
+
+
     if (video->isPlaying())
     {
-        info <<"\n" <<  video->getWidth()<<"x"<<video->getHeight();
-        info <<"\n" <<  ofToString(video->getPositionMs()) << " / " << ofToString(video->getDurationMs());  
+        info <<"\n" <<  video->getWidth()<<"x"<< video->getHeight();
         info <<"\n" <<  video->getCurrentFrameNbr() << " / " << video->getTotalNumFrames(); 
     }
+
+    if (this->isPlaying())
+        info <<"\n" <<  ofToString(this->getPositionMs()) << " / " << ofToString(this->getDurationMs());  
+        
+    
     info <<"\n";
     //info <<"\n" << osc.log();
 

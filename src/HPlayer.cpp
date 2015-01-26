@@ -41,6 +41,8 @@ void HPlayer::setup()
 	string media = "";
 	if (ofxArgParser::hasKey("media")) media = ofxArgParser::getValue("media");
 	if (ofxArgParser::hasKey("loop")) player.loop = (ofToInt(ofxArgParser::getValue("loop")) == 1);
+	bool start = false;
+	if (ofxArgParser::hasKey("start")) start = (ofToInt(ofxArgParser::getValue("start")) == 1);
 
 	//SETTINGS OSC COMMAND LINE
 	if (ofxArgParser::hasKey("in")) osc.portIN = ofToInt(ofxArgParser::getValue("in"));
@@ -61,6 +63,11 @@ void HPlayer::setup()
 		vector<string> playlist;		
 		playlist.push_back(media);
 		player.play(playlist);
+	}
+	else if (start)
+	{
+		player.load();
+		player.play();
 	}
 	
 	//SEND STATUS
