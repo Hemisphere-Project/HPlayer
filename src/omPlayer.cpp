@@ -21,15 +21,14 @@ void omPlayer::init(bool textured, bool audioHDMI)
 	params.mute = false;
 	params.blur = 0;
 	params.zoom = 100;
-
-	//SHADERS
-	noshader.load("NoShader");
-	blurV.load("VerticalBlur");
-	blurH.load("HorizontalBlur");
 	
 	//FRAMEBUFFERS
 	if (settings.enableTexture)
 	{
+		//SHADERS
+		blurV.load("VerticalBlur");
+		blurH.load("HorizontalBlur");
+
 		framebuffer.allocate(ofGetWidth(), ofGetHeight());
 		frameblur.allocate(ofGetWidth(), ofGetHeight());
 		this->clearscreen();

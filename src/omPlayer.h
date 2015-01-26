@@ -69,7 +69,7 @@ class omPlayer : public ofxOMXPlayer
 		void blur();
 		
 		//BUFFER & SHADER
-		ofShader noshader, blurH, blurV;
+		ofShader blurH, blurV;
 		ofFbo framebuffer, frameblur;				
 					
 		//PARAMS

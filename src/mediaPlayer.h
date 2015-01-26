@@ -1,7 +1,7 @@
 #pragma once
 #include "omPlayer.h"
 #include "sndPlayer.h"
-//#include "imgPlayer.h"
+#include "imgPlayer.h"
 
 class mediaPlayer : public omListener, public sndListener 
 {
@@ -73,7 +73,7 @@ class mediaPlayer : public omListener, public sndListener
                 
         sndPlayer* sound;
         omPlayer* video;
-        //imgPlayer image;
+        imgPlayer* image;
 
         string  basePath;
 

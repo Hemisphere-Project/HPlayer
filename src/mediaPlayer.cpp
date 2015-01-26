@@ -24,6 +24,9 @@ mediaPlayer::mediaPlayer()
 
     //VIDEO
     video = new omPlayer();
+
+    //IMAGE
+    image = new imgPlayer();
 }
 
 //-------------------------------------------------------------
@@ -35,6 +38,9 @@ void mediaPlayer::init()
 
     //SOUND
     sound->setListener(this);
+
+    //IMAGE
+    image->init(textured);
 }
 
 //-------------------------------------------------------------
@@ -62,6 +68,10 @@ void mediaPlayer::update()
     video->setZoom(this->zoom);
     video->setBlur(this->blur);
 
+    //IMAGE
+    image->setZoom(this->zoom);
+    image->setBlur(this->blur);
+
     //SOUND
     sound->volume(this->volume);
     sound->setMuted(this->mute);
@@ -74,8 +84,11 @@ void mediaPlayer::draw()
     //VIDEO
     video->show();
 
+    //IMAGE
+    image->show();
+
     //MESSAGE
-    if (!isPlaying()) this->displayStandby();
+    if (!this->isPlaying()) this->displayStandby();
     if (info) this->displayInfo();
 }
 
@@ -157,12 +170,22 @@ void mediaPlayer::play(int index)
         if (file.getExtension() == "mp4" or file.getExtension() == "mov" or file.getExtension() == "avi")
         { 
             sound->stop();
+            image->stop();
             video->play( file.path() );
         }
+        //SOUND
         else if (file.getExtension() == "wav" or file.getExtension() == "mp3" or file.getExtension() == "aif" or file.getExtension() == "ogg")
         {
             video->stop();
+            image->stop();
             sound->play( file.path() );
+        }
+        //IMAGE
+        else if (file.getExtension() == "bmp" or file.getExtension() == "jpg" or file.getExtension() == "jpeg" or file.getExtension() == "gif")
+        {
+            video->stop();
+            sound->stop();
+            image->play( file.path() );
         }
     }
     else 
@@ -215,6 +238,7 @@ void mediaPlayer::stop()
     //VIDEO & SOUND    
     video->stop();
     sound->stop();
+    image->stop();
 }
 
 //--------------------------------------------------------------
@@ -246,7 +270,7 @@ void mediaPlayer::seek(int timemilli){
 bool mediaPlayer::isPlaying()
 {
     //VIDEO & SOUND
-    return (video->isPlaying() or sound->isPlaying());
+    return (video->isPlaying() or sound->isPlaying() or image->isPlaying());
 }
 
 //--------------------------------------------------------------
