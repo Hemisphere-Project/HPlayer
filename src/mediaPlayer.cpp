@@ -166,23 +166,24 @@ void mediaPlayer::play(int index)
         this->currentIndex = index;
     
         ofFile file = mediaFiles[this->currentIndex];
+        string ext = ofToLower( file.getExtension() );
 
         //VIDEO
-        if (file.getExtension() == "mp4" or file.getExtension() == "mov" or file.getExtension() == "avi")
+        if (ext == "mp4" or ext == "mov" or ext == "avi")
         { 
             sound->stop();
             image->stop();
             video->play( file.path() );
         }
         //SOUND
-        else if (file.getExtension() == "wav" or file.getExtension() == "mp3" or file.getExtension() == "aif" or file.getExtension() == "ogg")
+        else if (ext == "wav" or ext == "mp3" or ext == "aif" or ext == "ogg")
         {
             video->stop();
             image->stop();
             sound->play( file.path() );
         }
         //IMAGE
-        else if (file.getExtension() == "bmp" or file.getExtension() == "jpg" or file.getExtension() == "jpeg" or file.getExtension() == "gif")
+        else if (ext == "bmp" or ext == "jpg" or ext == "jpeg" or ext == "gif" or ext == "tiff" or ext == "png")
         {
             video->stop();
             sound->stop();

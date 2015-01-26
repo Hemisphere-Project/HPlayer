@@ -64,15 +64,26 @@ void oscCom::execute(mediaPlayer* player)
         ofxOscMessage m;
         oscListener.getNextMessage( &m );       
 
+        //GET COMMAND FROM ADDRESS
         vector<string> address = ofSplitString(m.getAddress(),"/");
    		string command = address[1];
    		string postman = "";
+   		
+   		//DETECT DISPATCHER PREFIX IN THE ADDRESS
    		if (ofIsStringInString(command, ":") or command == "*")
    		{
    			postman = command;
    			command = address[2];
+   		
+   			//reverse FROM / TO
+   			if (ofIsStringInString(postman, ":")) 
+   			{
+   				vector<string> fromto = ofSplitString(postman,":");
+   				postman = fromto[1]+":"+fromto[0];
+   			}
    		}
 
+   		//EXECUTE COMMAND
 	  	if ((command == cmd("play")) or (command == cmd("playloop")) or (command == cmd("load")))
 		{			
 			vector<string> playlist;
