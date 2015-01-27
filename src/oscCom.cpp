@@ -89,6 +89,8 @@ void oscCom::execute(mediaPlayer* player)
    			}
    		}
 
+   		bool validCmd = true;
+
    		//EXECUTE COMMAND
 	  	if ((command == cmd("play")) or (command == cmd("playloop")) or (command == cmd("load")))
 		{			
@@ -180,7 +182,8 @@ void oscCom::execute(mediaPlayer* player)
 		}
 		else if(command == cmd("getStatus"))
 		{
-			this->status(player,postman);
+			//this->status(player,postman);
+			//will be send since it's a valid command !
 		}				
 		else if(command == cmd("quit"))
 		{
@@ -198,7 +201,17 @@ void oscCom::execute(mediaPlayer* player)
 		{
 			this->ipKXKM(player);
 		}
-		
+
+		//NOT VALID
+		else 
+		{
+			validCmd = false;
+		}
+
+		//VALID CMD => send Status!
+		if (validCmd) this->status(player,postman);
+
+		//OSC LOG
 		oscDebug += this->oscToString(m)+"\n";
 		//ofLog(OF_LOG_NOTICE,"-HP- OSC "+oscDebug);
     }	
