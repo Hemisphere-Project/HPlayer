@@ -64,16 +64,22 @@ void oscCom::execute(mediaPlayer* player)
         ofxOscMessage m;
         oscListener.getNextMessage( &m );       
 
+        //RECEIVED ADDRESS
+        //ofLog(OF_LOG_NOTICE,m.getAddress());
+
         //GET COMMAND FROM ADDRESS
         vector<string> address = ofSplitString(m.getAddress(),"/");
-   		string command = address[1];
+   		int key = 0;
+   		if (address[key] == "") key++; 
+
+   		string command = address[key];
    		string postman = "";
    		
    		//DETECT DISPATCHER PREFIX IN THE ADDRESS
    		if (ofIsStringInString(command, ":") or command == "*")
    		{
    			postman = command;
-   			command = address[2];
+   			command = address[key+1];
    		
    			//reverse FROM / TO
    			if (ofIsStringInString(postman, ":")) 
@@ -224,14 +230,12 @@ void oscCom::status(mediaPlayer* player)
 	this->status(player, this->prefix);
 }
 
-void oscCom::status(mediaPlayer* player, string postman) 
+void oscCom::status(mediaPlayer* player, string response_prefix) 
 {
 	if (!connected) return;
 	
 	ofxOscMessage m;
-	if (postman != "") m.setAddress("/"+postman+"/status");
-	else m.setAddress("/status");
-
+	m.setAddress(response_prefix+"/status");
 	m.addStringArg(player->name);
 	
 	string filepath = player->media();
@@ -264,7 +268,7 @@ void oscCom::status(mediaPlayer* player, string postman)
 	m.addIntArg(player->zoom);
 	m.addIntArg(player->blur);
 	
-	oscSender.sendMessage(m);
+	oscSender.sendMessage(m,false);
 }
 
 void oscCom::end(string file) 
@@ -272,10 +276,9 @@ void oscCom::end(string file)
 	if (!connected) return;
 	
 	ofxOscMessage m;
-	if (this->prefix != "") m.setAddress("/"+this->prefix+"/end");
-	else m.setAddress("/end");
+	m.setAddress(this->prefix+"/end");
 	m.addStringArg(file);
-	oscSender.sendMessage(m);
+	oscSender.sendMessage(m,false);
 }
 
 char* oscCom::getIP()
@@ -313,7 +316,7 @@ void oscCom::statusKXKM(mediaPlayer* player)
 	}
 	else m.addStringArg("stopmovie");
 	
-	oscSender.sendMessage(m);
+	oscSender.sendMessage(m,false);
 }
 
 void oscCom::ipKXKM(mediaPlayer* player) 
@@ -326,7 +329,7 @@ void oscCom::ipKXKM(mediaPlayer* player)
 	m.addStringArg("initinfo"); 
 	m.addStringArg(this->getIP());
 	
-	oscSender.sendMessage(m);
+	oscSender.sendMessage(m,false);
 }
 
 
