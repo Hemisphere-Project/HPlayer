@@ -1,6 +1,6 @@
 <system>
     <playerName>HPlayer</playerName>
-    <enableInfo>1</enableInfo>
+    <enableInfo>0</enableInfo>
 </system>
 <player>
     <volume>50</volume>
@@ -18,8 +18,8 @@
     <portOut>5000</portOut>
     <hostOut>localhost</hostOut>
     <base64>0</base64>
-    <commands>default</commands>
     <prefix />
+    <commands>default</commands>
 </osc>
 <commands>
     <default>

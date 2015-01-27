@@ -140,7 +140,7 @@ HPlayer also supports various optional command line arguments
 
 	//OSC
 	--in <port> 		: Input OSC Port (default=9000)
-	--out <port> 		: Output OSC Port (default=9001)
+	--out <port> 		: Output OSC Port (default=5000)
 	--host <ip>			: Send message to host (default=localhost)
 	--base64 <0:1>		: Base64 encoding for filepath (default=0)
 	--cmdmap <name>		: Use the OSC command map in settings.xml (default=default)

@@ -21,9 +21,9 @@ void HPlayer::setup()
 	player.basepath( settings.conf_str("media","path","/home/pi/media") );
 	player.loop = settings.conf_bool("media","loop",true);
 
-	osc.portIN 	= settings.conf_int("osc","portIn",OSCPORT_IN);
-	osc.portOUT = settings.conf_int("osc","portOut",OSCPORT_OUT);
-	osc.hostOUT = settings.conf_str("osc","hostOut",OSCHOST_OUT);
+	osc.portIN 	= settings.conf_int("osc","portIn",9000);
+	osc.portOUT = settings.conf_int("osc","portOut",5000);
+	osc.hostOUT = settings.conf_str("osc","hostOut","localhost");
 	osc.base64 = settings.conf_bool("osc","base64",false);
 	osc.prefix = settings.conf_str("osc","prefix","");
 	osc.cmdmap = settings.conf_str("osc","commands","default");
