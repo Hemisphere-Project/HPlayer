@@ -10,7 +10,7 @@ void HPlayer::setup()
 	xmlSettings settings("settings.xml");
 
 	player.name = settings.conf_str("system","playerName","HPlayer");	
-	player.info = settings.conf_bool("system","enableInfo",true);
+	player.info = settings.conf_bool("system","enableInfo",false);
 
 	player.volume = settings.conf_int("player","volume",50);
 	player.ahdmi = settings.conf_bool("player","audioHdmi",false);
