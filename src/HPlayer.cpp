@@ -14,12 +14,13 @@ void HPlayer::setup()
 
 	player.volume = settings.conf_int("player","volume",50);
 	player.ahdmi = settings.conf_bool("player","audioHdmi",false);
-	player.textured = settings.conf_bool("player","textured",true);
+	player.textured = settings.conf_bool("player","textured",false);
 	player.zoom = settings.conf_int("player","zoom",100);
 	player.blur = settings.conf_int("player","blur",0);
 
 	player.basepath( settings.conf_str("media","path","/home/pi/media") );
 	player.loop = settings.conf_bool("media","loop",true);
+	player.random = settings.conf_bool("media","random",false);
 
 	osc.portIN 	= settings.conf_int("osc","portIn",9000);
 	osc.portOUT = settings.conf_int("osc","portOut",5000);
@@ -42,8 +43,10 @@ void HPlayer::setup()
 	string media = "";
 	if (ofxArgParser::hasKey("media")) media = ofxArgParser::getValue("media");
 	if (ofxArgParser::hasKey("loop")) player.loop = (ofToInt(ofxArgParser::getValue("loop")) == 1);
+	if (ofxArgParser::hasKey("ran")) player.random = (ofToInt(ofxArgParser::getValue("ran")) == 1);
 	bool start = false;
 	if (ofxArgParser::hasKey("start")) start = (ofToInt(ofxArgParser::getValue("start")) == 1);
+	
 
 	//SETTINGS OSC COMMAND LINE
 	if (ofxArgParser::hasKey("in")) osc.portIN = ofToInt(ofxArgParser::getValue("in"));

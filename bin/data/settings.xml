@@ -5,13 +5,14 @@
 <player>
     <volume>50</volume>
     <audioHdmi>0</audioHdmi>
-    <textured>1</textured>
+    <textured>0</textured>
     <zoom>100</zoom>
     <blur>0</blur>
 </player>
 <media>
     <path>/home/pi/media</path>
     <loop>1</loop>
+    <random>1</random>
 </media>
 <osc>
     <portIn>9000</portIn>

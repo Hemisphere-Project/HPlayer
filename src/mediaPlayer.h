@@ -61,6 +61,7 @@ class mediaPlayer : public omListener, public sndListener
         bool    mute;
         bool    ahdmi;
         bool    loop;
+        bool    random;
         
         //VIDEO PARAMS
         bool    textured;

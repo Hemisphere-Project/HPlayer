@@ -9,6 +9,7 @@ mediaPlayer::mediaPlayer()
     this->mute    = false;
     this->ahdmi   = false;
     this->loop    = true;
+    this->random  = false;
     
     //VIDEO PARAMS
     this->textured = false;
@@ -169,7 +170,7 @@ void mediaPlayer::play(int index)
         string ext = ofToLower( file.getExtension() );
 
         //VIDEO
-        if (ext == "mp4" or ext == "mov" or ext == "avi")
+        if (ext == "mp4" or ext == "mov" or ext == "avi" or ext == "m4v")
         { 
             sound->stop();
             image->stop();
@@ -198,7 +199,9 @@ void mediaPlayer::play(int index)
 //--------------------------------------------------------------
 void mediaPlayer::next()
 {    
-    this->nextIndex = this->currentIndex+1;
+    if (this->random) this->nextIndex = (rand() % (int)( this->playlistSize() ));
+    else this->nextIndex = this->currentIndex+1;
+    //ofLog(OF_LOG_NOTICE, "Random: " + ofToString(this->nextIndex) + " / " + ofToString(this->playlistSize()-1) );
 }
 
 void mediaPlayer::onVideoEnd()
