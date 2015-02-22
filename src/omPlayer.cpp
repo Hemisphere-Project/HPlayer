@@ -72,7 +72,13 @@ void omPlayer::iceBreak()
 		//FREEZE detection (due to wrong frame counter)
 		if ((currentFrame == lastFrame) && (!this->isPaused())) 
 		{
-			if (freeze++ > 50)  listener->onVideoFreeze();
+			if (freeze++ > 50)  
+			{
+				listener->onVideoFreeze();
+				ofLog(OF_LOG_ERROR, "ICE BROKEN");
+				freeze = 0;
+				lastFrame = 0;
+			}
 		}
 		else freeze = 0;
 	}
