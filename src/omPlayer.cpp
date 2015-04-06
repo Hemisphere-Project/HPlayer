@@ -244,7 +244,7 @@ int omPlayer::getCurrentFrameNbr(){
 
 //--------------------------------------------------------------
 int omPlayer::getPositionMs(){
-	return static_cast<int>(this->getCurrentFrameNbr() * this->getDurationMs() / this->getTotalNumFrames());
+	return static_cast<int>( (double) this->getCurrentFrameNbr() * this->getDurationMs() / this->getTotalNumFrames());
 }
 
 //--------------------------------------------------------------
@@ -254,7 +254,7 @@ int omPlayer::getDurationMs(){
 
 //--------------------------------------------------------------
 int omPlayer::timeToFrameMs(int timemilli){
-	int frame = static_cast<int>(timemilli * this->getTotalNumFrames() / this->getDurationMs());
+	int frame = static_cast<int>( (double) timemilli * this->getTotalNumFrames() / this->getDurationMs());
 	return (frame % this->getTotalNumFrames());
 }
 
