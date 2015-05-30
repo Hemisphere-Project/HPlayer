@@ -37,8 +37,8 @@ class oscCom
 		int 	portOUT; /*!< remote port to send data to */
 		string 	hostOUT; /*!< remote IP to send data to */
 		bool 	base64; /*!< indicate (need for) base64 encoding of data */
-		string 	cmdmap;
-		string  prefix;
+		string 	cmdmap; /*!< mapping of command strings to OSC */
+		string  prefix; /*!< (internal) prefix for OSC messages */
 		
 		
 	private:

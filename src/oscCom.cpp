@@ -279,6 +279,7 @@ string oscCom::oscToString(ofxOscMessage m) {
  *
  * \param player to send status for
  * \see status (mediaPlayer* player, string response_prefix)
+ * \see statusKXKM(mediaPlayer* player)
  */
 void oscCom::status(mediaPlayer *player)
 {
@@ -292,6 +293,7 @@ void oscCom::status(mediaPlayer *player)
  * \param player to send status for
  * \param response_prefix custom (non-internal) prefix to send
  * \see status(mediaPlayer* player)
+ * \see statusKXKM(mediaPlayer* player)
  */
 void oscCom::status(mediaPlayer* player, string response_prefix)
 {
@@ -334,6 +336,10 @@ void oscCom::status(mediaPlayer* player, string response_prefix)
 	oscSender.sendMessage(m,false);
 }
 
+
+/**
+ * \todo determine use or remove
+ */
 void oscCom::end(string file) 
 {
 	if (!connected) return;
@@ -365,8 +371,14 @@ char* oscCom::getIP()
 }
 
 
-//KXKM centralized control specific
-void oscCom::statusKXKM(mediaPlayer* player) 
+/**
+ * [KXKM](https://github.com/KomplexKapharnaum/KXKM-remoteplayer) centralized
+ * control specific status command.
+ *
+ * \param player of which to send the data
+ * \see status(mediaPlayer* player)
+ */
+void oscCom::statusKXKM(mediaPlayer* player)
 {
 	if (!connected) return;
 	
@@ -389,6 +401,12 @@ void oscCom::statusKXKM(mediaPlayer* player)
 	oscSender.sendMessage(m,false);
 }
 
+/**
+ * Send player IP to [KXKM](https://github.com/KomplexKapharnaum/KXKM-remoteplayer).
+ *
+ * \param player of which to send the IP
+ * \see status(mediaPlayer* player)
+ */
 void oscCom::ipKXKM(mediaPlayer* player) 
 {
 	if (!connected) return;
