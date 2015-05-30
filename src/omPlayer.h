@@ -4,10 +4,10 @@
 #include "ofxOMXPlayerListener.h"
 
 struct dims_t {
-	int height;
-	int width;
-	int marginX;
-	int marginY;
+    int height; /*!< height of the display (screen) */
+	int width; /*!< width of the display (screen) */
+	int marginX; /*!< horizontal display margin */
+	int marginY; /*!< vertical display margin */
 };
 
 struct params_t {
@@ -26,8 +26,8 @@ struct params_t {
 class omListener
 {
 	public:
-		virtual void onVideoEnd() = 0;
-		virtual void onVideoFreeze() = 0;
+        virtual void onVideoEnd() = 0; /*!< handler for video end \todo reality check */
+        virtual void onVideoFreeze() = 0; /*!< handler for frozen video \todo reality check */
 };
 
 
@@ -43,9 +43,8 @@ class omPlayer : public ofxOMXPlayer
 		omPlayer();
 		void init(bool textured, bool audioHDMI);
 		void setListener(omListener* myListener);
-
-		void buffer();
-		void display();
+		void buffer(); /*!< \todo implementation (?) */
+		void display(); /*!< \todo implementation (?) */
 		void show();
 
 		//CONTROL
@@ -77,7 +76,8 @@ class omPlayer : public ofxOMXPlayer
 		void blur();
 
 		//BUFFER & SHADER
-		ofShader blurH, blurV;  /*!< shader for blurring */
+		ofShader blurH;  /*!< shader for horizontal blurring */
+        ofShader blurV;  /*!< shader for vertical blurring */
 		ofFbo framebuffer; /*!< plain frambuffer */
         ofFbo frameblur; /*!< framebuffer for blurring */
 
@@ -86,8 +86,8 @@ class omPlayer : public ofxOMXPlayer
 		params_t		params;	/*!< playback parameters */
 
 		//END DETECT & ANTIFREEZE
-		int lastFrame;
-    	int freeze;
+		int lastFrame; /*!< last frame displayed */
+    	int freeze; /*!< counter for frozen frames (?) \todo reality check */
 
     	omListener*	listener; /*!< event listener */
 };

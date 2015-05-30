@@ -82,6 +82,11 @@ void omPlayer::applyVolume()
 	}
 }
 
+/**
+ * Detect frozen frames (?)
+ *
+ * \todo reality check
+ */
 void omPlayer::iceBreak()
 {
 	//DETECT END / LOOP since Listener in ofxOMX are broken
