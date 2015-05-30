@@ -198,7 +198,3 @@ And we thank the hard work of
 	++ jkosoy ++
 	++ satoruhiga ++
 ```
-
-
-
-
