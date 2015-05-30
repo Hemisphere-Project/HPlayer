@@ -67,22 +67,16 @@ class mediaPlayer : public omListener, public sndListener
         bool    textured;
         int     zoom;
         int     blur;
-        
 
         
     private:
-                
+
+        void clearscreen();
         sndPlayer* sound;
         omPlayer* video;
         imgPlayer* image;
-
         string  basePath;
-
-        void clearscreen();
-        
-        vector<ofFile>  mediaFiles;
-        int             currentIndex;
-        int             nextIndex;
-
-
+        vector<ofFile>  mediaFiles; /*!< files to play */
+        int             currentIndex; /*!< current index being played */
+        int             nextIndex; /*!< next index to play */
 };

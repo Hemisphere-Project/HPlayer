@@ -1,5 +1,10 @@
 #include "mediaPlayer.h"
 
+/**
+ * Constructor to set default values
+ *
+ * \see init()
+ */
 mediaPlayer::mediaPlayer()
 {
     //GENERIC PARAMS
