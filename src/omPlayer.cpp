@@ -176,6 +176,7 @@ void omPlayer::show()
 	framebuffer.draw(0, 0);
 }
 
+
 /**
  * Clear the current screen/framebuffer.
  *
@@ -223,8 +224,14 @@ void omPlayer::blur()
 }
 
 
-/*START PLAYER*/
-//--------------------------------------------------------------
+/**
+ * Start the movie player by loading the given file.
+ *
+ * \param file to load
+ * \see stop()
+ * \see resume()
+ * \see seek(int timemilli)
+ */
 void omPlayer::play(string file){
 		
 	/*if (this->isPlaying()) this->stop(); 
@@ -235,8 +242,15 @@ void omPlayer::play(string file){
 	this->setPaused(false);	
 }
 
-/*SEEK TO TIME MILLISECONDS*/
-//--------------------------------------------------------------
+
+/**
+ * Seek to the given position.
+ *
+ * \todo implementation
+ * \param timemilli time in milliseconds
+ * \see play(string file)
+ * \see stop()
+ */
 void omPlayer::seek(int timemilli){
 		
 	//if (this->isPlaying())
@@ -245,46 +259,98 @@ void omPlayer::seek(int timemilli){
 }
 
 
-//--------------------------------------------------------------
+/**
+ * Stop current playback and clear screen.
+ *
+ * \see pause()
+ * \see play(string file)
+ * \see seek(int timemilli)
+ */
 void omPlayer::stop()
 {	
 	this->close();
 	this->clearscreen();
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Pause current playback.
+ *
+ * \see stop()
+ * \see play(string file)
+ * \see seek(int timemilli) 
+ */
 void omPlayer::pause(){
 	if (this->isPlaying()) this->setPaused(true);
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Resume current playback from being paused.
+ *
+ * \see pause()
+ * \see play(string file)
+ * \see stop()
+ * \see seek(int timemilli)
+ */
 void omPlayer::resume(){
 	if (this->isPlaying()) this->setPaused(false);
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Set volume for playback.
+ *
+ * \see setMuted(bool mute)
+ * \see params_t
+ */
 void omPlayer::volume(int v){
 	params.volume = v;
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Set mute status for playback.
+ *
+ * \param mute to set state (true = mute)
+ * \see volume(int v)
+ * \see params_t
+ */
 void omPlayer::setMuted(bool mute){
 	params.mute = mute;
 }
 
-//--------------------------------------------------------------
+/**
+ * Set amount of blurring.
+ *
+ * \param blur amount of blurring
+ * \see setZoom(int zoom)
+ * \see params_t
+ */
 void omPlayer::setBlur(int blur)
 {
 	this->params.blur = blur;
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Set amount of zooming.
+ * 
+ * \param zoom in percent
+ * \see setBlur(int blur)
+ * \see params_t
+ */
 void omPlayer::setZoom(int zoom)
 {
 	this->params.zoom = zoom;
 }
 
-//--------------------------------------------------------------
+/**
+ * Retrieve current frame number
+ *
+ * \returns current frame number
+ * \see getPositionMs()
+ */
 int omPlayer::getCurrentFrameNbr(){
 	return (this->getCurrentFrame() % this->getTotalNumFrames());
 }
