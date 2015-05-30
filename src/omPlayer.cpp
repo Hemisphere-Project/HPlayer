@@ -345,29 +345,59 @@ void omPlayer::setZoom(int zoom)
 	this->params.zoom = zoom;
 }
 
+
 /**
  * Retrieve current frame number
  *
  * \returns current frame number
  * \see getPositionMs()
+ * \see timeToFrameMs(int timemilli)
+ * \see getDurationMs()
  */
 int omPlayer::getCurrentFrameNbr(){
 	return (this->getCurrentFrame() % this->getTotalNumFrames());
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Retrieve current position in milliseconds.
+ *
+ * \returns current position in milliseconds
+ * \see getCurrentFrameNbr()
+ * \see getDurationMs()
+ * \see timeToFrameMs(int timemilli)
+ */
 int omPlayer::getPositionMs(){
 	return static_cast<int>( (double) this->getCurrentFrameNbr() * this->getDurationMs() / this->getTotalNumFrames());
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Get playback duration.
+ *
+ * \returns duration in milliseconds
+ * \see getPositionMs()
+ * \see timeToFrameMs(int timemilli)
+ */
 int omPlayer::getDurationMs(){
 	return static_cast<int>(this->getDurationInSeconds()*1000);
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Calculate the number of frames shown in a given timespan.
+ *
+ * \param timemilli timespan in milliseconds
+ * \returns number of frames per given timespan
+ * \see getDurationMs()
+ * \see getPositionMs()
+ * \see getCurrentFrameNbr()
+ * \todo reality check
+ */
 int omPlayer::timeToFrameMs(int timemilli){
+    // number of frames in given timespan
 	int frame = static_cast<int>( (double) timemilli * this->getTotalNumFrames() / this->getDurationMs());
+    // ?
 	return (frame % this->getTotalNumFrames());
 }
 

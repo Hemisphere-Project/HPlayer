@@ -73,12 +73,13 @@ class omPlayer : public ofxOMXPlayer
 		void makeRect();
 		void clearscreen();
 
-		//FX
+        // FX
 		void blur();
 
 		//BUFFER & SHADER
-		ofShader blurH, blurV;
-		ofFbo framebuffer, frameblur;
+		ofShader blurH, blurV;  /*!< shader for blurring */
+		ofFbo framebuffer; /*!< plain frambuffer */
+        ofFbo frameblur; /*!< framebuffer for blurring */
 
 		//PARAMS
 		dims_t			dim; /*!< screen dimensions */
