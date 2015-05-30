@@ -1,5 +1,8 @@
 #include "sndPlayer.h"
 
+/**
+ * Constructor for the `sndPlayer` class to set default values.
+ */
 sndPlayer::sndPlayer() {
     player = NULL;
     params.volume = 50;
