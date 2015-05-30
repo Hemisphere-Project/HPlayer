@@ -15,5 +15,5 @@ class xmlSettings : public ofxXmlSettings
         bool    conf_bool(string node,string leaf,bool def);
 
     private:
-        string confFile;
+        string confFile; /*!< filename/path of XML file to work on*/
 };
