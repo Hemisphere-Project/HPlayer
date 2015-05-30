@@ -1,5 +1,6 @@
 #include "sndPlayer.h"
 
+
 /**
  * Constructor for the `sndPlayer` class to set default values.
  */
@@ -13,10 +14,12 @@ sndPlayer::sndPlayer() {
     this->listener = NULL;
 }
 
+
 void sndPlayer::setListener(sndListener* myListener)
 {
     this->listener = myListener;
 }
+
 
 void sndPlayer::run()
 {
@@ -24,6 +27,15 @@ void sndPlayer::run()
     this->iceBreak();
 }
 
+
+/**
+ * Continue after freezing a frame (?).
+ *
+ * \see resume()
+ * \see run()
+ * \see play(string file)
+ * \todo reality check for description
+ */
 void sndPlayer::iceBreak()
 {
     if (player != NULL)
@@ -67,6 +79,10 @@ void sndPlayer::applyVolume()
  * Play a given file.
  *
  * \param file file (path) to play
+ * \see run()
+ * \see stop()
+ * \see pause()
+ * \see resume()
  */
 void sndPlayer::play(string file)
 {
@@ -81,6 +97,7 @@ void sndPlayer::play(string file)
  * Check if there is a file played currently.
  *
  * \returns true in case of an ongoing playback
+ * \see play(string file)
  */
 bool sndPlayer::isPlaying()
 {
@@ -103,6 +120,7 @@ bool sndPlayer::isPaused()
  *
  * \param timemilli timestamp in file given in milliseconds
  * \see getPositionMs()
+ * \see getDurationMs()
  */
 void sndPlayer::seek(int timemilli)
 {        
@@ -114,6 +132,7 @@ void sndPlayer::seek(int timemilli)
  * Stop the player.
  *
  * \see pause()
+ * \see play(string file)
  * \see setMuted(bool mute)
  */
 void sndPlayer::stop()
@@ -128,27 +147,37 @@ void sndPlayer::stop()
     }
 }
 
+
 /**
  * Pause an ongoing playback.
  *
  * \see resume()
  * \see stop()
  * \see setMuted(bool mute)
+ * \see play(string file)
  */
 void sndPlayer::pause(){
     if (player != NULL) player->setPaused(true);
 }
 
+
 /**
  * Continue an ongoing playback after a pause.
  *
  * \see pause()
+ * \see play(string file)
  */
 void sndPlayer::resume(){
     if (player != NULL) player->setPaused(false);
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Set volume for playback.
+ *
+ * \param v volume
+ * \see setMuted(bool mute)
+ */
 void sndPlayer::volume(int v){
     params.volume = v;
 }
@@ -170,13 +199,21 @@ void sndPlayer::setMuted(bool mute){
  * 
  * \return current position on miliseconds
  * \see seek(int timemilli)
+ * \see getDurationMs()
  */
 int sndPlayer::getPositionMs(){
     if (player != NULL) return player->getPositionMS();
     return 0;
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Get the duration of the current playback.
+ *
+ * \return duration of playback in miliseconds
+ * \see getPositionMs()
+ * \see seek(int timemilli)
+ */
 int sndPlayer::getDurationMs(){
     if (player != NULL)
     {
