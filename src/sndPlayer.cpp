@@ -15,12 +15,23 @@ sndPlayer::sndPlayer() {
 }
 
 
+/**
+ * Set listener
+ *
+ * \param myListener sound listener
+ * \todo reality check
+ */
 void sndPlayer::setListener(sndListener* myListener)
 {
     this->listener = myListener;
 }
 
 
+/**
+ * Get player ready for playback.
+ *
+ * \see play(string file)
+ */
 void sndPlayer::run()
 {
     this->applyVolume();
