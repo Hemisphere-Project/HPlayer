@@ -180,7 +180,9 @@ References
 ----------
 * [omxplayer github repository](https://github.com/popcornmix/omxplayer)
 * [elinux: omxplayer](http://elinux.org/Omxplayer)
+* [doxygen](http://www.stack.nl/~dimitri/doxygen/) (documentation framework)
 * [wikipedia: OpenMAX](https://en.wikipedia.org/wiki/OpenMAX)
+
 
 Credits
 -------------
