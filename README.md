@@ -147,7 +147,7 @@ HPlayer also supports various optional command line arguments
 	--prefix <prefix>	: Default prefix before OSC message (default="")
 
 	
-EXEMPLE (assuming /home/pi/media contains some videos):
+EXAMPLE (assuming /home/pi/media contains some videos):
 ```bash
 ./HPlayer --path /home/pi/media --start 1 --loop 1 --zoom 50 --info 1
 ```
