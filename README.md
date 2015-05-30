@@ -178,6 +178,8 @@ The available OSC commands are:
 
 References
 ----------
+* [omxplayer github repository](https://github.com/popcornmix/omxplayer)
+* [elinux: omxplayer](http://elinux.org/Omxplayer)
 * [wikipedia: OpenMAX](https://en.wikipedia.org/wiki/OpenMAX)
 
 Credits
