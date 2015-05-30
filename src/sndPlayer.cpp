@@ -62,7 +62,12 @@ void sndPlayer::applyVolume()
     if (player != NULL) player->setVolume(v);
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Play a given file.
+ *
+ * \param file file (path) to play
+ */
 void sndPlayer::play(string file)
 {
     this->stop();
@@ -71,25 +76,46 @@ void sndPlayer::play(string file)
     player->play();
 }
 
+
+/**
+ * Check if there is a file played currently.
+ *
+ * \returns true in case of an ongoing playback
+ */
 bool sndPlayer::isPlaying()
 {
     return (player != NULL and player->getIsPlaying());
 }
 
+
+/**
+ * Check if a playback is currently paused.
+ *
+ * \returns true in case of a pause in an ongoing playback
+ */
 bool sndPlayer::isPaused()
 {
     return (player != NULL and player->getIsPaused());
 }
 
-/*SEEK TO TIME MILLISECONDS*/
-//--------------------------------------------------------------
+/**
+ * Seek to a given timestamp.
+ *
+ * \param timemilli timestamp in file given in milliseconds
+ * \see getPositionMs()
+ */
 void sndPlayer::seek(int timemilli)
 {        
     if (player != NULL) player->setPositionMS(timemilli);
 }
 
 
-//--------------------------------------------------------------
+/**
+ * Stop the player.
+ *
+ * \see pause()
+ * \see setMuted(bool mute)
+ */
 void sndPlayer::stop()
 {   
     if (player != NULL)
@@ -102,12 +128,22 @@ void sndPlayer::stop()
     }
 }
 
-//--------------------------------------------------------------
+/**
+ * Pause an ongoing playback.
+ *
+ * \see resume()
+ * \see stop()
+ * \see setMuted(bool mute)
+ */
 void sndPlayer::pause(){
     if (player != NULL) player->setPaused(true);
 }
 
-//--------------------------------------------------------------
+/**
+ * Continue an ongoing playback after a pause.
+ *
+ * \see pause()
+ */
 void sndPlayer::resume(){
     if (player != NULL) player->setPaused(false);
 }
@@ -117,12 +153,24 @@ void sndPlayer::volume(int v){
     params.volume = v;
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Mute an ongoing playback.
+ *
+ * \see stop()
+ * \see pause()
+ * \see volume(int v)
+ */
 void sndPlayer::setMuted(bool mute){
     params.mute = mute;
 }
 
-//--------------------------------------------------------------
+/**
+ * Get current position in miliseconds.
+ * 
+ * \return current position on miliseconds
+ * \see seek(int timemilli)
+ */
 int sndPlayer::getPositionMs(){
     if (player != NULL) return player->getPositionMS();
     return 0;

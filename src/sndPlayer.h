@@ -53,6 +53,6 @@ class sndPlayer
         sndListener* listener;
 
         //END DETECT & ANTIFREEZE
-        float lastPos;
+        float lastPos;  /*!< last known position in file to be played */
         int freeze;
 };
