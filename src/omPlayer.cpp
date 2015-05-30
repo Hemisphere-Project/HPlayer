@@ -1,11 +1,21 @@
 #include "omPlayer.h"
 
+/**
+ * Constructor (event listener set to NULL)
+ */
 omPlayer::omPlayer():ofxOMXPlayer()
 {
 	listener = NULL;
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Initialize the omPlayer
+ *
+ * \param textured set to true to enable textures
+ * \param audioHDMI set to true to use HDMI for audio output
+ * \see omPlayer()
+ */
 void omPlayer::init(bool textured, bool audioHDMI)
 {	
 	//OMXPLAYER Settings
@@ -15,13 +25,13 @@ void omPlayer::init(bool textured, bool audioHDMI)
 	settings.enableTexture 		= textured;	
 	settings.initialVolume		= 0.5;
 	settings.enableLooping 		= false;
-	
+
 	//params DEFAULTS
 	params.volume = settings.initialVolume;
 	params.mute = false;
 	params.blur = 0;
 	params.zoom = 100;
-	
+
 	//FRAMEBUFFERS
 	if (settings.enableTexture)
 	{
@@ -42,11 +52,23 @@ void omPlayer::init(bool textured, bool audioHDMI)
 	this->setup(settings);	
 }
 
+
+/**
+ * Set an event listener.
+ *
+ * \see omListener
+ */
 void omPlayer::setListener(omListener* myListener)
 {
 	this->listener = myListener;
 }
 
+
+/**
+ * Apply volume settings
+ *
+ * \see params_t
+ */
 void omPlayer::applyVolume()
 {
 	//APPLY VOLUME CHANGES
@@ -85,12 +107,18 @@ void omPlayer::iceBreak()
 	lastFrame = currentFrame;
 }
 
+
+/**
+ * Create display rectangle.
+ *
+ * \see dims_t
+ */
 void omPlayer::makeRect()
 {
 	//WIDTH
 	dim.width = floor( ofGetHeight() * this->getWidth() / this->getHeight() ); //WIDTH RATIO FROM MAXIMIZED HEIGHT
 	if (dim.width > ofGetWidth()) dim.width = ofGetWidth(); //SHRINK IF WIDTH IS TO BIG
-	
+
 	//ZOOM
 	if (params.zoom != 100)
 	{
@@ -98,16 +126,23 @@ void omPlayer::makeRect()
 		if (dim.width > ofGetWidth()) dim.width = ofGetWidth(); //SHRINK IF WIDTH IS TO BIG
 	}
 	if (!(dim.width > 0)) return;
-	
+
 	//HEIGHT 
 	dim.height = floor( dim.width * this->getHeight() / this->getWidth() ); //KEEP ASPECT RATIO
 	if (!(dim.height > 0)) return;
-	
+
 	//MARGINS
 	dim.marginX = floor((ofGetWidth()-dim.width)/2);
 	dim.marginY = floor((ofGetHeight()-dim.height)/2);
 }
 
+
+/**
+ * Draw a frame(buffer) on screen.
+ *
+ * \see clearscreen()
+ * \see blur()
+ */
 void omPlayer::show()
 {
 	//APPLY NEW VOLUME / MUTE
@@ -118,7 +153,7 @@ void omPlayer::show()
 
 	//ANTI FREEZE
 	this->iceBreak();
-	
+
 	//CHECK IF TEXTURE MODE ENABLED AND VALID
 	if(!this->isTextureEnabled()) return;
 	if (!((this->getHeight() > 0) and (this->getWidth() > 0))) return;
@@ -141,7 +176,11 @@ void omPlayer::show()
 	framebuffer.draw(0, 0);
 }
 
-
+/**
+ * Clear the current screen/framebuffer.
+ *
+ * \see show()
+ */
 void omPlayer::clearscreen()
 {
 	if (!this->isTextureEnabled()) return;
@@ -150,6 +189,14 @@ void omPlayer::clearscreen()
 	framebuffer.end();
 }
 
+
+/**
+ * Apply blur to frame.
+ *
+ * \see params_t
+ * \see show()
+ * \see clearscreen()
+ */
 void omPlayer::blur()
 {	
 	for(int i = 0; i < 1; i++) 

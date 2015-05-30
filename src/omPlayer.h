@@ -11,12 +11,18 @@ struct dims_t {
 };
 
 struct params_t {
-    int     volume;
-    bool    mute;
-    int     blur;
-    int     zoom;
+    int     volume; /*!< playback volume */
+    bool    mute;   /*!< indicate that playback is muted */
+    int     blur;   /*!< indicate amount of blur */
+    int     zoom;   /*!< inidcate zoom level in percent */
 };
 
+
+/**
+ * Event listener (?)
+ *
+ * \todo reality check
+ */
 class omListener
 {
 	public:
@@ -24,9 +30,13 @@ class omListener
 		virtual void onVideoFreeze() = 0;
 };
 
+
+/**
+ * Class to control the omxplayer
+ */
 class omPlayer : public ofxOMXPlayer 
 {
-	
+
 	public:
 
 		//RUN
@@ -37,50 +47,47 @@ class omPlayer : public ofxOMXPlayer
 		void buffer();
 		void display();
 		void show();
-		
+
 		//CONTROL
 		void play(string file);
 		void stop();
 		void pause();
 		void resume();
-		
 		void seek(int timemilli);
-		
 		void volume(int v);
 		void setMuted(bool mute);
 		void setBlur(int blur);
 		void setZoom(int zoom);
-		
+
 		//STATE
 		int 	getCurrentFrameNbr();
 		int 	getPositionMs();
 		int 	getDurationMs();
 		int 	timeToFrameMs(int timemilli);
-		
+
 	private:
-			
+
 		//DISPLAY LOGICS
 		void applyVolume();
 		void iceBreak();
 		void makeRect();
 		void clearscreen();
-		
+
 		//FX
 		void blur();
-		
+
 		//BUFFER & SHADER
 		ofShader blurH, blurV;
-		ofFbo framebuffer, frameblur;				
-					
+		ofFbo framebuffer, frameblur;
+
 		//PARAMS
-		dims_t			dim;
-		params_t		params;	
+		dims_t			dim; /*!< screen dimensions */
+		params_t		params;	/*!< playback parameters */
 
 		//END DETECT & ANTIFREEZE
 		int lastFrame;
     	int freeze;
 
-    	//EVENTS
-    	omListener*	listener;
+    	omListener*	listener; /*!< event listener */
 };
 
