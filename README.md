@@ -176,6 +176,9 @@ The available OSC commands are:
 	/getStatus		: Ask for status info
 	/quit			: Exit the player
 
+References
+----------
+* [wikipedia: OpenMAX](https://en.wikipedia.org/wiki/OpenMAX)
 
 Credits
 -------------
