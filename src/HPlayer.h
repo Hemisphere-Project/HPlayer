@@ -15,13 +15,12 @@ class HPlayer : public ofBaseApp
 		void setup();
 		void update();
 		void draw();
-
 		void keyPressed(int key);
 	
 	private:
 
 		//PLAYER
-		mediaPlayer player;	
+		mediaPlayer player;
 		
 		//OSC
 		oscCom	osc;

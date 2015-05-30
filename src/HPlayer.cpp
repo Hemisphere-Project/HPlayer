@@ -1,6 +1,10 @@
 #include "HPlayer.h"
 
-//--------------------------------------------------------------
+
+/**
+ * Set up the HPlayer object. This is needed for the interaction with
+ * openFrameworks.
+ */
 void HPlayer::setup()
 {
 	//OF SETTINGS
@@ -80,8 +84,10 @@ void HPlayer::setup()
 }
 
 
-
-//--------------------------------------------------------------
+/**
+ * Update the internal data of the HPlayer object. It handles the off-screen
+ * computation done when interacting with openFrameworks.
+ */
 void HPlayer::update()
 {
 	//EXECUTE RECEIVED OSC COMMANDS
@@ -91,7 +97,9 @@ void HPlayer::update()
 	player.update();
 }
 
-//--------------------------------------------------------------
+/**
+ * Do the on-screen drawing when interacting with openFrameworks.
+ */
 void HPlayer::draw()
 {
 	//PLAYER DRAW
@@ -99,9 +107,12 @@ void HPlayer::draw()
 }
 
 
-
-//--------------------------------------------------------------
-void HPlayer::keyPressed  (int key){ 
+/**
+ * Callback for openFrameworks to execute upon pressing a (keyboard) key.
+ * 
+ * \param key The keycode of the key pressed
+ */
+void HPlayer::keyPressed(int key){ 
 	if(key & OF_KEY_MODIFIER){
 		switch(key){
 		case OF_KEY_LEFT:
