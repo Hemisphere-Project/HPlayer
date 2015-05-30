@@ -1,6 +1,10 @@
 #pragma once
 #include "ofxXmlSettings.h"
 
+/**
+ * A class to handle (default) XML settings. It is based on
+ * [ofxXmlSettings](http://www.openframeworks.cc/documentation/ofxXmlSettings/ofxXmlSettings.html).
+ */
 class xmlSettings : public ofxXmlSettings
 {
     
