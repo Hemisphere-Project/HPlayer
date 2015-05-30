@@ -21,12 +21,9 @@ class HPlayer : public ofBaseApp
 
 		//PLAYER
 		mediaPlayer player;
-		
-		//OSC
-		oscCom	osc;
 
-		//EVENTS
-		char eventString[255];
+		oscCom	osc; /*!< OSC communication class */
+		char eventString[255]; /*!< event (description) going on */
 				
 };
 
