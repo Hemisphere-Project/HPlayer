@@ -47,6 +47,12 @@ void sndPlayer::iceBreak()
     }
 }
 
+
+/**
+ * Set the volume according to the internal parameters.
+ *
+ * \see paramsSND_t
+ */
 void sndPlayer::applyVolume()
 {
     //APPLY VOLUME CHANGES

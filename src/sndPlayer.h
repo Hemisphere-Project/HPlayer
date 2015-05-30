@@ -46,7 +46,7 @@ class sndPlayer
         void iceBreak();
 
         //PARAMS
-        paramsSND_t        params;
+        paramsSND_t        params;  /*!< volume/mute for sound */
         ofOpenALSoundPlayer* player;
 
         //EVENTS
