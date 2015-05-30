@@ -13,7 +13,7 @@ class oscCom
 
 		//CONNECT
 		void	connect();
-		void	connect(string cmd_profile);
+		void	connect(string cmd_profile); /*!< \todo implementation (?) */
 
 		//COMMAND TRANSLATION
 		string cmd(string command);
