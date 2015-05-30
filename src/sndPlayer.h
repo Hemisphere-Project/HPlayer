@@ -10,8 +10,8 @@ struct paramsSND_t {
 class sndListener
 {
     public:
-        virtual void onSoundEnd() = 0;
-        virtual void onSoundFreeze() = 0;
+        virtual void onSoundEnd() = 0; /*!< handler for end of playback \todo reality check */
+        virtual void onSoundFreeze() = 0; /*!< handler for frozen sound \todo reality check */
 };
 
 
@@ -47,12 +47,12 @@ class sndPlayer
 
         //PARAMS
         paramsSND_t        params;  /*!< volume/mute for sound */
-        ofOpenALSoundPlayer* player;
+        ofOpenALSoundPlayer* player; /*< sound player to control \todo reality check */
 
         //EVENTS
-        sndListener* listener;
+        sndListener* listener; /*!< sound event listener */
 
         //END DETECT & ANTIFREEZE
         float lastPos;  /*!< last known position in file to be played */
-        int freeze;
+        int freeze; /*!< number of frozen frames \todo reality check */
 };
