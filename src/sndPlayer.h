@@ -47,7 +47,7 @@ class sndPlayer
 
         //PARAMS
         paramsSND_t        params;  /*!< volume/mute for sound */
-        ofOpenALSoundPlayer* player; /*< sound player to control \todo reality check */
+        ofOpenALSoundPlayer* player; /*!< sound player to control \todo reality check */
 
         //EVENTS
         sndListener* listener; /*!< sound event listener */
