@@ -63,7 +63,7 @@ class mediaPlayer : public omListener, public sndListener
         bool    random; /*!< indicate random playback of playlist */
 
         //VIDEO PARAMS
-        bool    textured;
+        bool    textured; /*!< indicate the application of video effects */
         int     zoom; /*!< zoom factor in percent */
         int     blur; /*!< amount of blurring (effect) in video */
 
