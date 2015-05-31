@@ -19,9 +19,7 @@ class HPlayer : public ofBaseApp
 	
 	private:
 
-		//PLAYER
-		mediaPlayer player;
-
+		mediaPlayer player; /*!< container to manage content */
 		oscCom	osc; /*!< OSC communication class */
 		char eventString[255]; /*!< event (description) going on */
 				
