@@ -53,7 +53,6 @@ class mediaPlayer : public omListener, public sndListener
         //INFO
         string media();
 
-
         //GENERIC PARAMS
         string  name;
         bool    info;
@@ -62,21 +61,21 @@ class mediaPlayer : public omListener, public sndListener
         bool    ahdmi;
         bool    loop;
         bool    random;
-        
+
         //VIDEO PARAMS
         bool    textured;
-        int     zoom;
-        int     blur;
+        int     zoom; /*!< zoom factor in percent */
+        int     blur; /*!< amount of blurring (effect) in video */
 
         
     private:
 
         void clearscreen();
-        sndPlayer* sound;
-        omPlayer* video;
-        imgPlayer* image;
-        string  basePath;
+        sndPlayer* sound; /*!< handle audion content */
+        omPlayer* video; /*!< handle video content */
+        imgPlayer* image; /*!< handle image content */
+        string  basePath; /*!< base directory to load files from */
         vector<ofFile>  mediaFiles; /*!< files to play */
-        int             currentIndex; /*!< current index being played */
-        int             nextIndex; /*!< next index to play */
+        int             currentIndex; /*!< current index (in playlist) being played */
+        int             nextIndex; /*!< next index (in playlist) to play */
 };

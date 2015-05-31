@@ -35,7 +35,11 @@ mediaPlayer::mediaPlayer()
     image = new imgPlayer();
 }
 
-//-------------------------------------------------------------
+/**
+ * Initalize all sound, video and image handling.
+ *
+ * \see mediaPlayer()
+ */
 void mediaPlayer::init()
 {
     //VIDEO
@@ -49,14 +53,24 @@ void mediaPlayer::init()
     image->init(textured);
 }
 
-//-------------------------------------------------------------
+
+/**
+ * Set basic path/directory to load files from.
+ *
+ * \param path to set
+ */
 void mediaPlayer::basepath(string path)
 {
     ofDirectory dir(path);
     if (dir.isDirectory()) basePath = path;
 }
 
-//-------------------------------------------------------------
+
+/**
+ * Update the internal state of the mediaPlayer according to all
+ * (changed) parameters. This method is to be used in conjunction with
+ * openFrameworks.
+ */
 void mediaPlayer::update()
 {
     //CHANGE MEDIA
