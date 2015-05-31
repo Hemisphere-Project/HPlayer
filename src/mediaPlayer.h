@@ -54,13 +54,13 @@ class mediaPlayer : public omListener, public sndListener
         string media();
 
         //GENERIC PARAMS
-        string  name;
-        bool    info;
-        int     volume;
-        bool    mute;
-        bool    ahdmi;
-        bool    loop;
-        bool    random;
+        string  name; /*!< name of release \todo reality check */
+        bool    info; /*!< control display of (meta) information */
+        int     volume; /*!< volume level */
+        bool    mute; /*!< indicate mute state */
+        bool    ahdmi; /*!< use HDMI for audio output */
+        bool    loop;  /*!< loop the current playback */
+        bool    random; /*!< indicate random playback of playlist */
 
         //VIDEO PARAMS
         bool    textured;
@@ -70,7 +70,7 @@ class mediaPlayer : public omListener, public sndListener
         
     private:
 
-        void clearscreen();
+        void clearscreen(); /*!< \todo implementation (?) */
         sndPlayer* sound; /*!< handle audion content */
         omPlayer* video; /*!< handle video content */
         imgPlayer* image; /*!< handle image content */
