@@ -3,6 +3,10 @@
 #include "ofxOMXPlayer.h"
 #include "ofxOMXPlayerListener.h"
 
+
+/**
+ * A datastructure to store data about screen/display dimensions.
+ */
 struct dims_t {
     int height; /*!< height of the display (screen) */
 	int width; /*!< width of the display (screen) */
@@ -10,6 +14,10 @@ struct dims_t {
 	int marginY; /*!< vertical display margin */
 };
 
+
+/**
+ * A datastructure to store data about image display.
+ */
 struct params_t {
     int     volume; /*!< playback volume */
     bool    mute;   /*!< indicate that playback is muted */

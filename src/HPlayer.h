@@ -7,9 +7,13 @@
 #include "xmlSettings.h"
 #include "oscCom.h"
 
+
+/**
+ * The basic class to handle the interaction with
+ * openFrameworks.
+ */
 class HPlayer : public ofBaseApp
-{
-	
+{	
 	public:
 	
 		void setup();
@@ -22,6 +26,4 @@ class HPlayer : public ofBaseApp
 		mediaPlayer player; /*!< container to manage content */
 		oscCom	osc; /*!< OSC communication class */
 		char eventString[255]; /*!< event (description) going on */
-				
 };
-

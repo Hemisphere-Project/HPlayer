@@ -3,9 +3,13 @@
 #include "sndPlayer.h"
 #include "imgPlayer.h"
 
+
+/**
+ * A class to control the playback of media. It implements listeners for
+ * sound and video events.
+ */
 class mediaPlayer : public omListener, public sndListener 
 {
-
     public:
 
         //INIT
@@ -67,7 +71,7 @@ class mediaPlayer : public omListener, public sndListener
         int     zoom; /*!< zoom factor in percent */
         int     blur; /*!< amount of blurring (effect) in video */
 
-        
+
     private:
 
         void clearscreen(); /*!< \todo implementation (?) */

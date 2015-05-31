@@ -4,11 +4,14 @@
 #include "ofxCrypto.h"
 #include "xmlSettings.h"
 
+
+/**
+ * A class to handle the communication of the player via OSC.
+ */
 class oscCom
-{
-	
+{	
 	public:
-		
+
 		oscCom();
 
 		//CONNECT
@@ -18,20 +21,19 @@ class oscCom
 		//COMMAND TRANSLATION
 		string cmd(string command);
 		char* getIP();
-		
+
 		//RECEIVE
 		void 	execute(mediaPlayer* player);
 		string	log();
 		string 	oscToString(ofxOscMessage m);
-		
+
 		//SEND	
 		void 	status(mediaPlayer* player);
 		void 	status(mediaPlayer* player, string postman);
 		void 	end(string file);
-
 		void statusKXKM(mediaPlayer* player);
 		void ipKXKM(mediaPlayer* player);
-		
+
 		//SETTINGS
 		int 	portIN; /*!< local port to listen for incoming data */
 		int 	portOUT; /*!< remote port to send data to */
@@ -47,7 +49,5 @@ class oscCom
 		ofxOscSender 	oscSender;	/*!< sender of OSC info [details](http://openframeworks.cc/documentation/ofxOsc/ofxOscSender.html) */
 		ofxOscReceiver  oscListener; /*!< receiver of OSC info [details](http://openframeworks.cc/documentation/ofxOsc/ofxOscReceiver.html) */
 		string 			oscDebug;	/*!< OSC debug messages */
-		ofxXmlSettings commander;	/*!< main configuration */
-		
+		ofxXmlSettings commander;	/*!< main configuration */		
 };
-

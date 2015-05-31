@@ -1,12 +1,18 @@
 #pragma once
 #include "ofSoundPlayer.h"
 
+/**
+ * A datastructure to store information about audio playback.
+ */
 struct paramsSND_t {
     int     volume; /*!< volume of the sound */
     bool    mute;   /*!< store if sound is currently muted */
 };
 
 
+/**
+ * Listener for sound events.
+ */
 class sndListener
 {
     public:
@@ -15,6 +21,9 @@ class sndListener
 };
 
 
+/**
+ * A class to control the audio playback.
+ */
 class sndPlayer 
 {
     public:

@@ -5,6 +5,9 @@
 #include "ofShader.h"
 #include "ofFbo.h"
 
+/**
+ * A datastructure to store data about screen/display dimensions.
+ */
 struct dimsIMG_t {
     int height; /*!< height of the display (screen) */
     int width; /*!< width of the display (screen) */
@@ -12,12 +15,20 @@ struct dimsIMG_t {
     int marginY; /*!< vertical display margin */
 };
 
+
+/**
+ * A datastructure to store data about image display.
+ */
 struct paramsIMG_t {
     int     blur; /*!< indicate amount of blur */
     int     zoom; /*!< level of zoom (in percent) */
     bool textured; /*!< indicate use of effects */
 };
 
+
+/**
+ * A class to wrap the handling of images.
+ */
 class imgPlayer 
 {
     
