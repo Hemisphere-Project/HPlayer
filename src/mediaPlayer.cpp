@@ -1,5 +1,10 @@
 #include "mediaPlayer.h"
 
+/**
+ * Constructor to set default values
+ *
+ * \see init()
+ */
 mediaPlayer::mediaPlayer()
 {
     //GENERIC PARAMS
@@ -30,7 +35,11 @@ mediaPlayer::mediaPlayer()
     image = new imgPlayer();
 }
 
-//-------------------------------------------------------------
+/**
+ * Initalize all sound, video and image handling.
+ *
+ * \see mediaPlayer()
+ */
 void mediaPlayer::init()
 {
     //VIDEO
@@ -44,14 +53,24 @@ void mediaPlayer::init()
     image->init(textured);
 }
 
-//-------------------------------------------------------------
+
+/**
+ * Set basic path/directory to load files from.
+ *
+ * \param path to set
+ */
 void mediaPlayer::basepath(string path)
 {
     ofDirectory dir(path);
     if (dir.isDirectory()) basePath = path;
 }
 
-//-------------------------------------------------------------
+
+/**
+ * Update the internal state of the mediaPlayer according to all
+ * (changed) parameters. This method is to be used in conjunction with
+ * openFrameworks.
+ */
 void mediaPlayer::update()
 {
     //CHANGE MEDIA
@@ -79,7 +98,11 @@ void mediaPlayer::update()
     sound->run();
 }
 
-//-------------------------------------------------------------
+/**
+ * Output visual data on screen. To be used with openFrameworks.
+ *
+ * \see clearscreen()
+ */
 void mediaPlayer::draw()
 {
     //VIDEO
@@ -93,10 +116,16 @@ void mediaPlayer::draw()
     if (info) this->displayInfo();
 }
 
-//CONTROL
 
-/*LOAD FILE LIST*/
-//--------------------------------------------------------------
+/**
+ * Load files into playlist based on the base path.
+ *
+ * \see load()
+ * \see play(string file)
+ * \see play()
+ * \see play(int index)
+ * \see play(vector<string> playlist)
+ */
 void mediaPlayer::load(vector<string> playlist)
 {
     vector<ofFile> list;
@@ -121,6 +150,16 @@ void mediaPlayer::load(vector<string> playlist)
     this->mediaFiles = list;
 }
 
+
+/**
+ * Load the internal playlist based on the base path.
+ *
+ * \see load(vector<string> playlist)
+ * \see play(string file)
+ * \see play()
+ * \see play(int index)
+ * \see play(vector<string> playlist)
+ */
 void mediaPlayer::load()
 {
     vector<string> playlist;        
@@ -128,13 +167,29 @@ void mediaPlayer::load()
     this->load(playlist);
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Get size (length) of playlist
+ *
+ * \returns number of items in playlist
+ */
 int mediaPlayer::playlistSize(){
     return mediaFiles.size();
 }
 
-/*PLAY FILE LIST*/
-//--------------------------------------------------------------
+
+/**
+ * Play a files from a given list.
+ *
+ * \param playlist with filenames to play
+ * \see play(string file)
+ * \see play()
+ * \see play(int index)
+ * \see stop()
+ * \see prev()
+ * \see next()
+ * \see isPlaying()
+ */
 void mediaPlayer::play(vector<string> playlist)
 {   
     this->load(playlist);
@@ -142,8 +197,19 @@ void mediaPlayer::play(vector<string> playlist)
     else this->stop();
 }
 
-/*PLAY FILE*/
-//--------------------------------------------------------------
+
+/**
+ * Play a single given file.
+ *
+ * \param file to play
+ * \see play(vector<string> playlist)
+ * \see play()
+ * \see play(int index)
+ * \see stop()
+ * \see prev()
+ * \see next()
+ * \see isPlaying()
+ */
 void mediaPlayer::play(string file)
 {
     vector<string> playlist;
@@ -151,15 +217,35 @@ void mediaPlayer::play(string file)
     this->play(playlist);
 }
 
-/*PLAY FIRST OF THE LIST*/
-//--------------------------------------------------------------
+
+/**
+ * Play the first item of the (internal) playlist.
+ *
+ * \see play(vector<string> playlist)
+ * \see play(string file)
+ * \see play(int index)
+ * \see stop()
+ * \see prev()
+ * \see next()
+ * \see isPlaying()
+ */
 void mediaPlayer::play(){
-        
     if (this->playlistSize() > 0) this->play(0);
 }
 
-/*PLAY FILE AT INDEX IN THE LIST*/
-//--------------------------------------------------------------
+
+/**
+ * Play specific item of the (internal) playlist.
+ *
+ * \param index of file in playlist to play
+ * \see play(vector<string> playlist)
+ * \see play(string file)
+ * \see play()
+ * \see stop()
+ * \see prev()
+ * \see next()
+ * \see isPlaying()
+ */
 void mediaPlayer::play(int index)
 {
     if ((index >= 0) && (index < this->playlistSize())) 
@@ -195,8 +281,16 @@ void mediaPlayer::play(int index)
 }
 
 
-/*PLAY NEXT FILE IN THE LIST*/
-//--------------------------------------------------------------
+/**
+ * Play next file in playlist.
+ *
+ * \see play(vector<string> playlist)
+ * \see play(string file)
+ * \see play(int index)
+ * \see play()
+ * \see stop()
+ * \see prev()
+ */
 void mediaPlayer::next()
 {    
     if (this->random) this->nextIndex = (rand() % (int)( this->playlistSize() ));
@@ -204,36 +298,84 @@ void mediaPlayer::next()
     //ofLog(OF_LOG_NOTICE, "Random: " + ofToString(this->nextIndex) + " / " + ofToString(this->playlistSize()-1) );
 }
 
+
+/**
+ * Handle end of video file.
+ *
+ * \see onVideoFreeze()
+ * \see onSoundEnd()
+ * \see onSoundFreeze()
+ */
 void mediaPlayer::onVideoEnd()
 {
     this->next();
 }
 
+
+/**
+ * Handle freezing video.
+ *
+ * \see onVideoEnd()
+ * \see onSoundEnd()
+ * \see onSoundFreeze()
+ */
 void mediaPlayer::onVideoFreeze()
 {
     this->next();
 }
 
+
+/**
+ * Handle end of video file.
+ *
+ * \see onSoundFreeze()
+ * \see onVideoEnd()
+ * \see onVideoFreeze()
+ */
 void mediaPlayer::onSoundEnd()
 {
     this->next();
 }
 
+
+/**
+ * Handle freezing sound.
+ *
+ * \see onSoundEnd()
+ * \see onVideoEnd()
+ * \see onVideoFreeze()
+ */
 void mediaPlayer::onSoundFreeze()
 {
     this->next();
 }
 
 
-/*PLAY PREVIOUS FILE IN THE LIST*/
-//--------------------------------------------------------------
+/**
+ * Play previous file in playlist.
+ *
+ * \see play(vector<string> playlist)
+ * \see play(string file)
+ * \see play(int index)
+ * \see play()
+ * \see stop()
+ * \see next()
+ */
 void mediaPlayer::prev()
 {    
     this->nextIndex = this->currentIndex-1;
 }
 
 
-//--------------------------------------------------------------
+/**
+ * Stop current playback.
+ *
+ * \see play()
+ * \see pause()
+ * \see resume()
+ * \see next()
+ * \see prev()
+ */
 void mediaPlayer::stop()
 {
     //VIDEO & SOUND    
@@ -244,39 +386,80 @@ void mediaPlayer::stop()
     this->nextIndex = 0;
 }
 
-//--------------------------------------------------------------
+/**
+ * Pause current video and sound playback.
+ *
+ * \see play()
+ * \see stop()
+ * \see resume()
+ * \see next()
+ * \see prev()
+ * \see displayStandby()
+ */
 void mediaPlayer::pause(){
-    
     //VIDEO & SOUND
     video->pause();
     sound->pause();
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Resume currently paused video and sound playback.
+ *
+ * \see play()
+ * \see stop()
+ * \see pause()
+ * \see next()
+ * \see prev()
+ */
 void mediaPlayer::resume(){
-    
     //VIDEO & SOUND
     video->resume();
     sound->resume();
 }
 
-/*SEEK TO TIME MILLISECONDS*/
-//--------------------------------------------------------------
+
+/**
+ * Seek to position inidated by the timestamp
+ *
+ * \param timemilli time in milliseconds
+ * \see getPositionMs()
+ * \see getDurationMs()
+ */
 void mediaPlayer::seek(int timemilli){
-        
     //VIDEO & SOUND
     video->seek(timemilli);
     sound->seek(timemilli);
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Check if there is currently a playback going on.
+ *
+ * \returns indication of playback
+ * \see play(vector<string> playlist)
+ * \see play(string file)
+ * \see play(int index)
+ * \see play()
+ * \see isPaused()
+ */
 bool mediaPlayer::isPlaying()
 {
     //VIDEO & SOUND
     return (video->isPlaying() or sound->isPlaying() or image->isPlaying());
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Check if there is currently a paused playback.
+ *
+ * \returns indication of paused playback
+ * \see isPlaying()
+ * \see play(vector<string> playlist)
+ * \see play(string file)
+ * \see play(int index)
+ * \see play()
+ */
 bool mediaPlayer::isPaused()
 {
     //VIDEO & SOUND
@@ -285,14 +468,28 @@ bool mediaPlayer::isPaused()
     return false;
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Get info (path?) on currently playing media.
+ *
+ * \returns path media file
+ * \see displayInfo()
+ * \todo reality check
+ */
 string mediaPlayer::media()
 {
     if (this->isPlaying()) return mediaFiles[this->currentIndex].path();
     return "";
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Get current playback position.
+ *
+ * \returns playback position in milliseconds
+ * \see seek(int timemilli)
+ * \see getDurationMs()
+ */
 int mediaPlayer::getPositionMs()
 {
     if (video->isPlaying()) return video->getPositionMs();
@@ -300,7 +497,13 @@ int mediaPlayer::getPositionMs()
     return 0;
 }
 
-//--------------------------------------------------------------
+/**
+ * Get playback duration.
+ *
+ * \returns duration in milliseconds
+ * \see seek(int timemilli)
+ * \see getPositionMs()
+ */
 int mediaPlayer::getDurationMs()
 {
     if (video->isPlaying()) return video->getDurationMs();
@@ -308,15 +511,20 @@ int mediaPlayer::getDurationMs()
     return 0;
 }
 
-//--------------------------------------------------------------
-void mediaPlayer::displayInfo() {
 
+/**
+ * Display info about media and playback (filenames, framerate, playback
+ * status etc.).
+ *
+ * \see displayStandby()
+ */
+void mediaPlayer::displayInfo() {
     stringstream info;
     info << "- HPLAYER INFO -\n";
-    
+
     info <<"\n" << name;
     info <<"\n" << ofToString(ofGetFrameRate()) + "FPS";
-    
+
     info <<"\n";
     if (this->isPlaying()) info << "PLAYING" ;
     else  info << "STOPPED";
@@ -326,8 +534,6 @@ void mediaPlayer::displayInfo() {
     info <<"\n" <<  "VOL " << volume;
     info <<"\n";
     info <<"\n" <<  ofGetWidth()<<"x"<<ofGetHeight();
-    
-
 
     if (video->isPlaying())
     {
@@ -337,20 +543,22 @@ void mediaPlayer::displayInfo() {
 
     if (this->isPlaying())
         info <<"\n" <<  ofToString(this->getPositionMs()) << " / " << ofToString(this->getDurationMs());  
-        
-    
+
     info <<"\n";
     //info <<"\n" << osc.log();
-
-    ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);
-    
+    ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);    
 }
 
-//--------------------------------------------------------------
-void mediaPlayer::displayStandby() {
 
+/**
+ * Display media info on standby.
+ *
+ * \see displayInfo()
+ * \see play()
+ * \see stop()
+ */
+void mediaPlayer::displayStandby() {
     stringstream info;
     info << " .:: "<<name<<" ::. ";
     ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);
-    
 }

@@ -3,6 +3,10 @@
 #include <arpa/inet.h>
 #include <ofFileUtils.h>
 
+
+/**
+ * Constructor to set default values.
+ */
 oscCom::oscCom()
 {
 	portIN = 9000;
@@ -13,6 +17,12 @@ oscCom::oscCom()
 	prefix = "";
 }
 
+
+/**
+ * Connect to the network, load configuration and set (default) commands
+ *
+ * \see getIP()
+ */
 void oscCom::connect()
 {
 	oscListener.setup(portIN);
@@ -40,7 +50,6 @@ void oscCom::connect()
 	settings.conf_str("commands:default","info", "info");
 	settings.conf_str("commands:default","host", "host");
 	settings.conf_str("commands:default","quit", "quit");
-	
 
 	//load config
 	commander.loadFile("settings.xml");
@@ -48,11 +57,24 @@ void oscCom::connect()
 	commander.pushTag(cmdmap);
 }
 
+
+/**
+ * Map command string to OSC command.
+ *
+ * \see oscToString(ofxOscMessage m)
+ */
 string oscCom::cmd(string command)
 {
 	return commander.getValue(command,command);
 }
 
+
+/**
+ * Execute all (qeued) (OSC) commands received and send status info
+ * for valid ones.
+ *
+ * \param player to execute commands for
+ */
 void oscCom::execute(mediaPlayer* player)
 {
 	if (!connected) return;
@@ -74,13 +96,13 @@ void oscCom::execute(mediaPlayer* player)
 
    		string command = address[key];
    		string postman = "";
-   		
+
    		//DETECT DISPATCHER PREFIX IN THE ADDRESS
    		if (ofIsStringInString(command, ":") or command == "*")
    		{
    			postman = command;
    			command = address[key+1];
-   		
+
    			//reverse FROM / TO
    			if (ofIsStringInString(postman, ":")) 
    			{
@@ -93,10 +115,10 @@ void oscCom::execute(mediaPlayer* player)
 
    		//EXECUTE COMMAND
 	  	if ((command == cmd("play")) or (command == cmd("playloop")) or (command == cmd("load")))
-		{			
+		{
 			vector<string> playlist;
 			string filepath;
-			
+
 			for(int k = 0; k < m.getNumArgs(); k++)
 				if ((m.getArgType(k) == OFXOSC_TYPE_STRING) && (m.getArgAsString(k) != "")) 
 				{
@@ -217,10 +239,23 @@ void oscCom::execute(mediaPlayer* player)
     }	
 }
 
+
+/**
+ * Get (OSC) debug message.
+ *
+ * \return debug message string
+ */
 string oscCom::log() {
 	return oscDebug;
 }
 
+
+/**
+ * Map OSC message to string.
+ *
+ * \return string containing address, type and value
+ * \see cmd(string command)
+ */
 string oscCom::oscToString(ofxOscMessage m) {
 	
 	string message = m.getAddress()+" ";
@@ -238,22 +273,39 @@ string oscCom::oscToString(ofxOscMessage m) {
 	return message;
 }
 
-void oscCom::status(mediaPlayer* player)
+
+/**
+ * Send current status for given player via OSC.
+ *
+ * \param player to send status for
+ * \see status (mediaPlayer* player, string response_prefix)
+ * \see statusKXKM(mediaPlayer* player)
+ */
+void oscCom::status(mediaPlayer *player)
 {
 	this->status(player, this->prefix);
 }
 
-void oscCom::status(mediaPlayer* player, string response_prefix) 
+
+/**
+ * Send current status for given player via OSC.
+ *
+ * \param player to send status for
+ * \param response_prefix custom (non-internal) prefix to send
+ * \see status(mediaPlayer* player)
+ * \see statusKXKM(mediaPlayer* player)
+ */
+void oscCom::status(mediaPlayer* player, string response_prefix)
 {
 	if (!connected) return;
-	
+
 	ofxOscMessage m;
 	m.setAddress(response_prefix+"/status");
 	m.addStringArg(player->name);
-	
+
 	string filepath = player->media();
 	if (base64) filepath = ofxCrypto::base64_encode(filepath);
-	
+
 	if (player->isPlaying())
 	{
 		if (player->isPaused()) m.addStringArg("paused");
@@ -277,13 +329,17 @@ void oscCom::status(mediaPlayer* player, string response_prefix)
 	
 	if (player->mute) m.addStringArg("muted");
 	else m.addStringArg("unmuted");
-	
+
 	m.addIntArg(player->zoom);
 	m.addIntArg(player->blur);
-	
+
 	oscSender.sendMessage(m,false);
 }
 
+
+/**
+ * \todo determine use or remove
+ */
 void oscCom::end(string file) 
 {
 	if (!connected) return;
@@ -294,6 +350,13 @@ void oscCom::end(string file)
 	oscSender.sendMessage(m,false);
 }
 
+
+/**
+ * Get current IP.
+ *
+ * \return IP as string
+ * \see connect()
+ */
 char* oscCom::getIP()
 {
 	int fd;
@@ -308,8 +371,14 @@ char* oscCom::getIP()
 }
 
 
-//KXKM centralized control specific
-void oscCom::statusKXKM(mediaPlayer* player) 
+/**
+ * [KXKM](https://github.com/KomplexKapharnaum/KXKM-remoteplayer) centralized
+ * control specific status command.
+ *
+ * \param player of which to send the data
+ * \see status(mediaPlayer* player)
+ */
+void oscCom::statusKXKM(mediaPlayer* player)
 {
 	if (!connected) return;
 	
@@ -332,17 +401,21 @@ void oscCom::statusKXKM(mediaPlayer* player)
 	oscSender.sendMessage(m,false);
 }
 
+/**
+ * Send player IP to [KXKM](https://github.com/KomplexKapharnaum/KXKM-remoteplayer).
+ *
+ * \param player of which to send the IP
+ * \see status(mediaPlayer* player)
+ */
 void oscCom::ipKXKM(mediaPlayer* player) 
 {
 	if (!connected) return;
-	
+
 	ofxOscMessage m;
 	m.setAddress("/"+player->name);
 
 	m.addStringArg("initinfo"); 
 	m.addStringArg(this->getIP());
-	
+
 	oscSender.sendMessage(m,false);
 }
-
-

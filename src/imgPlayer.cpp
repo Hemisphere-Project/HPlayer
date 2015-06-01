@@ -1,10 +1,18 @@
 #include "imgPlayer.h"
 
+
+/**
+ * Plan constructor.
+ */
 imgPlayer::imgPlayer() {
     player = NULL;
 }
 
-//--------------------------------------------------------------
+/**
+ * Initialize a image player with default values.
+ *
+ * \param textured to indicate application
+ */
 void imgPlayer::init(bool textured)
 {   
     //params DEFAULTS
@@ -25,7 +33,13 @@ void imgPlayer::init(bool textured)
     }
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Play/load a given file.
+ *
+ * \param file to load
+ * \see show()
+ */
 void imgPlayer::play(string file)
 {
     this->stop();
@@ -33,6 +47,15 @@ void imgPlayer::play(string file)
     player->loadImage( file );
 }
 
+
+/**
+ * Display the content of the current frame(buffer).
+ *
+ * \see clearscreen()
+ * \see blur()
+ * \see makeRect()
+ * \see play(string file)
+ */
 void imgPlayer::show()
 {
     if (!this->isPlaying()) return;
@@ -59,6 +82,11 @@ void imgPlayer::show()
     else player->draw(this->dim.marginX, this->dim.marginY, this->dim.width, this->dim.height);
 }
 
+/**
+ * Create display rectangle.
+ *
+ * \see show()
+ */
 void imgPlayer::makeRect()
 {
     //WIDTH
@@ -82,6 +110,13 @@ void imgPlayer::makeRect()
     dim.marginY = floor((ofGetHeight()-dim.height)/2);
 }
 
+
+/**
+ * Clear the current screen/framebuffer.
+ *
+ * \see show()
+ * \see blur()
+ */
 void imgPlayer::clearscreen()
 {
     framebuffer.begin();
@@ -89,6 +124,13 @@ void imgPlayer::clearscreen()
     framebuffer.end();
 }
 
+
+/**
+ * Apply blur to framebuffer.
+ *
+ * \see show()
+ * \see clearscreen()
+ */
 void imgPlayer::blur()
 {   
     for(int i = 0; i < 1; i++) 
@@ -114,12 +156,24 @@ void imgPlayer::blur()
     }
 }
 
+
+/**
+ * Check if there is currently a playback going on.
+ *
+ * \returns indication of playback
+ * \see stop()
+ */
 bool imgPlayer::isPlaying()
 {
     return (player != NULL);
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Stop current playback.
+ *
+ * \see isPlaying()
+ */
 void imgPlayer::stop()
 {   
     if (player != NULL)
@@ -132,13 +186,26 @@ void imgPlayer::stop()
     }
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Set amount of blur.
+ *
+ * \param blur amount
+ * \see blur()
+ * \see clearscreen()
+ */
 void imgPlayer::setBlur(int blur)
 {
     this->params.blur = blur;
 }
 
-//--------------------------------------------------------------
+
+/**
+ * Set the level of zoom.
+ *
+ * \param zoom level in percent
+ * \see clearscreen()
+ */
 void imgPlayer::setZoom(int zoom)
 {
     this->params.zoom = zoom;
