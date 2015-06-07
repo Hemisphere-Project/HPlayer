@@ -6,6 +6,11 @@
 omPlayer::omPlayer():ofxOMXPlayer()
 {
 	listener = NULL;
+
+    dim.width = ofGetWidth();
+    dim.height = ofGetHeight();
+    dim.marginX = 0;
+    dim.marginY = 0;
 }
 
 
