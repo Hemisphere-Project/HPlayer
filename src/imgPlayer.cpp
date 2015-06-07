@@ -6,10 +6,15 @@
  */
 imgPlayer::imgPlayer() {
     player = NULL;
+
     dim.width = ofGetWidth();
     dim.height = ofGetHeight();
     dim.marginX = 0;
     dim.marginY = 0;
+
+    params.blur = 0;
+    params.zoom = 100;
+    params.textured = false;
 }
 
 /**
