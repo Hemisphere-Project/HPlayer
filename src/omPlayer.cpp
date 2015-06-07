@@ -16,6 +16,8 @@ omPlayer::omPlayer():ofxOMXPlayer()
     params.blur = 0;
     params.zoom = 100;
     params.textured = false;
+
+	lastFrame = 0;
 }
 
 
