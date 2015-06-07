@@ -12,6 +12,7 @@ omPlayer::omPlayer():ofxOMXPlayer()
     dim.marginX = 0;
     dim.marginY = 0;
 
+    params.volume = 0.8;
     params.blur = 0;
     params.zoom = 100;
     params.textured = false;
