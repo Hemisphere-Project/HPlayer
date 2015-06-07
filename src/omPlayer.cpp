@@ -18,6 +18,7 @@ omPlayer::omPlayer():ofxOMXPlayer()
     params.textured = false;
 
 	lastFrame = 0;
+    freeze = 0;
 }
 
 
