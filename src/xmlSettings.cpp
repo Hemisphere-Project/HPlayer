@@ -37,8 +37,7 @@ int xmlSettings::conf_int(string node,string leaf,int def)
  */
 string xmlSettings::conf_str(string node,string leaf,const string &def)
 {
-    string val = "";
-    val = getValue(node+":"+leaf,def);
+    string val = getValue(node+":"+leaf,def);
     if (val == def) setValue(node+":"+leaf,val);
     saveFile(confFile);
     return val;

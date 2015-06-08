@@ -15,6 +15,7 @@ oscCom::oscCom()
 	base64 = false;
 	cmdmap = "default";
 	prefix = "";
+    connected = false;
 }
 
 
