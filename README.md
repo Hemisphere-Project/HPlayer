@@ -42,10 +42,14 @@ The player covers the whole screen with a black background and keep video aspect
 Installation from binary
 -------------
 
-You can simply download the content of the bin folder with the last build.
-Don't forget the data subfolder which contains the shaders. It will not work without this folder. We will include those extra files into the binary in a futur release for more convinience.
+If you are running a recent Raspbian on your Pi 1 (armv6), you can simply download the content of the bin folder with the last build. Don't forget the data subfolder which contains the shaders. It will not work without this folder. We will include those extra files into the binary in a futur release for more convinience.
+You will also need to install some dependencies (mainly libfreeimage3), and don't forget to setup the GPU memory split with at least 128mb (you can do it from raspi-config) !
 
-The binary might need some dependencies, we will populate a list very soon.
+You can use those commands to install dependencies and download the binaries into a HPlayer directory in your HOME folder.
+```bash
+sudo apt-get install subversion libfreeimage3
+svn export https://github.com/Hemisphere-Project/HPlayer/trunk/bin ~/HPlayer
+```
 
 
 Installation from source
@@ -53,7 +57,7 @@ Installation from source
 
 HPlayer is build on top of:
 ```
-	* OpenFrameworks 0.8.x ARMv6
+	* OpenFrameworks 0.9.x ARMv6/7
 	* ofxOMXPlayer from jvcleave
 	* ofxCrypto from jkosoy 
 	* ofxArgParser from satoruhiga
@@ -74,8 +78,10 @@ sudo reboot
 ```
 
 
-####1. Download / Install OpenFrameworks ARMv6
->Instructions: http://www.openframeworks.cc/setup/raspberrypi/
+####1. Clone / Install OpenFrameworks
+//// TODO 
+//// Download OF from GIT (since we must use OF 0.9.x)
+////
 
 ####2. Clone Addons ofxOMXPlayer / ofxArgParser / ofxCrypto
 ```bash
@@ -147,7 +153,7 @@ HPlayer also supports various optional command line arguments
 	--prefix <prefix>	: Default prefix before OSC message (default="")
 
 	
-EXAMPLE (assuming /home/pi/media contains some videos):
+EXAMPLE (assuming /home/pi/media contains some medias):
 ```bash
 ./HPlayer --path /home/pi/media --start 1 --loop 1 --zoom 50 --info 1
 ```
