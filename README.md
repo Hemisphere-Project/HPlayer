@@ -84,6 +84,7 @@ OF 0.8.4 is the current stable release, but doesn't feature a key change that ap
 You could download the last OF from github but for simplicity and stability we will use here a patched version of the current 0.8.4 stable OF version. The patch will become obsolete as soon as OF 0.9 is released.
 
 **Download and install OF**
+
 on RPI1 (armv6): [http://openframeworks.cc/setup/raspberrypi/Raspberry-Pi-Getting-Started.html] 
 ```bash
 cd
