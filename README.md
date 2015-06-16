@@ -80,10 +80,11 @@ sudo reboot
 
 ####1. Download OpenFrameworks, Install dependencies and patch ofxOSC
 
-OF 0.8.4 is the current stable release, but doesn't feature a key change that appears in 0F 0.9 future release: the possibility to disable Bundles while forging OSC messages via the now embbeded ofxOSC addon.
+OF 0.8.4 is the current stable release, but doesn't feature a key change that appears in 0F 0.9 future release: the possibility to disable Bundles while forging OSC messages via the now embbeded ofxOsc addon.
 You could download the last OF from github but for simplicity and stability we will use here a patched version of the current 0.8.4 stable OF version. The patch will become obsolete as soon as OF 0.9 is released.
 
 **Download and install OF**
+
 on RPI1 (armv6): [http://openframeworks.cc/setup/raspberrypi/Raspberry-Pi-Getting-Started.html] 
 ```bash
 cd
@@ -109,10 +110,9 @@ cd ~/openFrameworks/examples/3d/3DPrimitivesExample/
 make
 ```
 
-**Update ofxOsc** (if you are using an OF version lower than 0.9):
+**Patch ofxOsc** (if you are using an OF version lower than 0.9):
 ```bash
-sudo apt-get install subversion
-svn export https://github.com/openframeworks/openFrameworks/trunk/addons/ofxOsc/src ~/openFrameworks/addons/ofxOsc/src --force
+curl https://gist.githubusercontent.com/Maigre/a87adb190943903bbf66/raw/611a038216508e42b012da85705de150667d392b/gistfile1.cpp | patch -N
 ```
 
 ####2. Clone Addons ofxOMXPlayer / ofxArgParser / ofxCrypto
