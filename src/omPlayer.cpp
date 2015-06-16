@@ -5,7 +5,7 @@
  */
 omPlayer::omPlayer():ofxOMXPlayer()
 {
-	listener = NULL;
+    listener = NULL;
 
     dim.width = ofGetWidth();
     dim.height = ofGetHeight();
@@ -15,9 +15,8 @@ omPlayer::omPlayer():ofxOMXPlayer()
     params.volume = 0.8;
     params.blur = 0;
     params.zoom = 100;
-    params.textured = false;
 
-	lastFrame = 0;
+    lastFrame = 0;
     freeze = 0;
 }
 
