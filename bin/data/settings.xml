@@ -12,7 +12,7 @@
 <media>
     <path>/home/pi/media</path>
     <loop>1</loop>
-    <random>1</random>
+    <random>0</random>
 </media>
 <osc>
     <portIn>9000</portIn>
