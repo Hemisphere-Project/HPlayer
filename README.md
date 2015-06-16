@@ -68,7 +68,7 @@ HPlayer is build on top of:
 ####0. Setup and Update your RaspberryPi 
 ```bash
 sudo apt-get update && sudo apt-get upgrade
-sudo apt-get install git
+sudo apt-get install git 
 sudo raspi-config
 	# Expand filesystem
 	# Split GPU memory to 128 or 256
@@ -78,10 +78,42 @@ sudo reboot
 ```
 
 
-####1. Clone / Install OpenFrameworks
-//// TODO 
-//// Download OF from GIT (since we must use OF 0.9.x)
-////
+####1. Download OpenFrameworks, Install dependencies and patch ofxOSC
+
+OF 0.8.4 is the current stable release, but doesn't feature a key change that appears in 0F 0.9 future release: the possibility to disable Bundles while forging OSC messages via the now embbeded ofxOSC addon.
+You could download the last OF from github but for simplicity and stability we will use here a patched version of the current 0.8.4 stable OF version. The patch will become obsolete as soon as OF 0.9 is released.
+
+**Download and install OF**
+on RPI1 (armv6): [http://openframeworks.cc/setup/raspberrypi/Raspberry-Pi-Getting-Started.html] 
+```bash
+cd
+curl -O http://www.openframeworks.cc/versions/v0.8.4/of_v0.8.4_linuxarmv6l_release.tar.gz
+mkdir openFrameworks
+tar vxfz of_v0.8.4_linuxarmv6l_release.tar.gz -C openFrameworks --strip-components 1
+cd ~/openFrameworks/scripts/linux/debian_armv6l
+sudo ./install_dependencies.sh
+make Release -C ~/openFrameworks/libs/openFrameworksCompiled/project
+```
+
+on RPi2 (armv7): [http://forum.openframeworks.cc/t/raspberry-pi-2-setup-guide/18690] 
+```bash
+cd
+curl -O http://www.openframeworks.cc/versions/v0.8.4/of_v0.8.4_linuxarmv7l_release.tar.gz
+mkdir openFrameworks
+tar vxfz of_v0.8.4_linuxarmv7l_release.tar.gz -C openFrameworks --strip-components 1
+curl https://raw.githubusercontent.com/openframeworks/openFrameworks/master/libs/openFrameworksCompiled/project/linuxarmv7l/config.linuxarmv7l.rpi2.mk -o ~/openFrameworks/libs/openFrameworksCompiled/project/linuxarmv7l/config.linuxarmv7l.rpi2.mk
+cd ~/openFrameworks/scripts/linux/debian
+sudo ./install_dependencies.sh
+export MAKEFLAGS=-j4 PLATFORM_VARIANT=rpi2
+cd ~/openFrameworks/examples/3d/3DPrimitivesExample/
+make
+```
+
+**Update ofxOsc** (if you are using an OF version lower than 0.9):
+```bash
+sudo apt-get install subversion
+svn export https://github.com/openframeworks/openFrameworks/trunk/addons/ofxOsc/src ~/openFrameworks/addons/ofxOsc/src --force
+```
 
 ####2. Clone Addons ofxOMXPlayer / ofxArgParser / ofxCrypto
 ```bash
@@ -93,7 +125,7 @@ git clone https://github.com/jkosoy/ofxCrypto.git
 
 ####3. Clone project HPlayer
 ```bash
-cd ~/openFrameworks/apps/myApps/ 
+cd ~/openFrameworks/apps/myApps/
 git clone https://github.com/Hemisphere-Project/HPlayer.git
 ```
 
@@ -117,9 +149,9 @@ Use it!
 Be Aware that HPlayer is still a work in progress, and some features could 
 have major or minor bugs. 
 Please use the Issue report on GitHub if you find some ! 
-You are also welcome to ask for new features or submit ideas and fix ;)
+You are also welcome to ask for new features or submit ideas and fixes ;)
 
-HPlayer can be configured with the data/settings.xml file.
+HPlayer can be configured with the **data/settings.xml** file.
 If this file is missing, it will be created on first start by the player with default values.
 
 HPlayer also supports various optional command line arguments 
@@ -199,7 +231,7 @@ HPlayer is developped by the Hemisphere-Project Team
 	++ Alain Barthelemy ++
 	++ Jeremie Forge ++
 ```
-And we thank the hard work of 
+We thank the hard work of 
 ```
 	++ RaspberryPi Creators ++
 	++ OpenFrameworks Developpers ++
@@ -207,4 +239,8 @@ And we thank the hard work of
 	++ jvcleave ++
 	++ jkosoy ++
 	++ satoruhiga ++
+```
+We also thank the contributors to this project
+```
+	++ tpltnt ++
 ```
