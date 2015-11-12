@@ -42,7 +42,7 @@ The player covers the whole screen with a black background and keep video aspect
 Installation from binary
 -------------
 
-If you are running a recent Raspbian on your Pi 1 (armv6), you can simply download the content of the bin folder with the last build. Don't forget the data subfolder which contains the shaders. It will not work without this folder. We will include those extra files into the binary in a futur release for more convinience.
+If you are running a recent Raspbian, you can simply download the content of the bin folder with the last build. Don't forget the data subfolder which contains the shaders. It will not work without this folder. We will include those extra files into the binary in a futur release for more convinience.
 You will also need to install some dependencies (mainly libfreeimage3), and don't forget to setup the GPU memory split with at least 128mb (you can do it from raspi-config) !
 
 You can use those commands to install dependencies and download the binaries into a HPlayer directory in your HOME folder.
@@ -54,6 +54,9 @@ svn export https://github.com/Hemisphere-Project/HPlayer/trunk/bin ~/HPlayer
 
 Installation from source
 -------------
+
+**Warning: since OF switch to 0.9, installation from source might be broken..
+Update soon !**
 
 HPlayer is build on top of:
 ```
