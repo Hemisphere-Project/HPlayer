@@ -136,8 +136,8 @@ void mediaPlayer::load(vector<string> playlist)
         else if (file.isDirectory())
         {
             ofDirectory dir(playlist[k]);
-            dir.sort();
             dir.listDir();
+            dir.sort();
             for(int j = 0; j < dir.size(); j++)
                 if (dir.getFile(j).isFile()) list.push_back(dir.getFile(j));
         }
