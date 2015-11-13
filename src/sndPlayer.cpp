@@ -60,7 +60,7 @@ void sndPlayer::iceBreak()
             if (lastPos > currentPos) listener->onSoundEnd();
 
             //FREEZE detection (due to wrong frame counter)
-            if ((lastPos == currentPos) && (!this->isPaused())) 
+            if ((lastPos == currentPos) && (!this->isPaused()))
             {
                 if (freeze++ > 10)  listener->onSoundFreeze();
             }
@@ -99,7 +99,8 @@ void sndPlayer::play(string file)
 {
     this->stop();
     player = new ofOpenALSoundPlayer();
-    player->loadSound( file, true );
+    //OF0.8: player->loadSound( file, true );
+    player->load( file, true );
     player->play();
 }
 
@@ -112,7 +113,8 @@ void sndPlayer::play(string file)
  */
 bool sndPlayer::isPlaying()
 {
-    return (player != NULL and player->getIsPlaying());
+    //OF0.8: return (player != NULL and player->getIsPlaying());
+    return (player != NULL and player->isPlaying());
 }
 
 
@@ -123,7 +125,8 @@ bool sndPlayer::isPlaying()
  */
 bool sndPlayer::isPaused()
 {
-    return (player != NULL and player->getIsPaused());
+    //OF0.8: return (player != NULL and player->getIsPaused());
+    return (player != NULL and player->isPaused());
 }
 
 /**
@@ -134,7 +137,7 @@ bool sndPlayer::isPaused()
  * \see getDurationMs()
  */
 void sndPlayer::seek(int timemilli)
-{        
+{
     if (player != NULL) player->setPositionMS(timemilli);
 }
 
@@ -147,7 +150,7 @@ void sndPlayer::seek(int timemilli)
  * \see setMuted(bool mute)
  */
 void sndPlayer::stop()
-{   
+{
     if (player != NULL)
     {
         player->stop();
@@ -207,7 +210,7 @@ void sndPlayer::setMuted(bool mute){
 
 /**
  * Get current position in miliseconds.
- * 
+ *
  * \return current position on miliseconds
  * \see seek(int timemilli)
  * \see getDurationMs()
@@ -233,4 +236,3 @@ int sndPlayer::getDurationMs(){
     }
     return 0;
 }
-

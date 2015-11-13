@@ -2,19 +2,22 @@
 #include "omPlayer.h"
 #include "sndPlayer.h"
 #include "imgPlayer.h"
+#include "ofxArgParser.h"
+#include "xmlSettings.h"
 
 
 /**
  * A class to control the playback of media. It implements listeners for
  * sound and video events.
  */
-class mediaPlayer : public omListener, public sndListener 
+class mediaPlayer : public omListener, public sndListener
 {
     public:
 
         //INIT
         mediaPlayer();
         void init();
+        void configure(string file, bool cmdLineOverwrite);
         void basepath(string path);
 
         //RUN
@@ -38,7 +41,7 @@ class mediaPlayer : public omListener, public sndListener
 
         void play(vector<string> playlist);
         void play(string file);
-        void play(int index);       
+        void play(int index);
         void play();
 
         void next();

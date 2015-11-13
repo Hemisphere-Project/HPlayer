@@ -19,8 +19,9 @@ What is it
 
 HPlayer is a media player for RaspberryPi controllable with OSC commands.
 
-The player is build on top of OMXPlayer and OpenFrameworks,
+The player is build on top of OMXPlayer and OpenFrameworks ,
 it's GPU accelerated and offers OpenGL Shaders and Textures support.
+It has been developped under Raspbian Jessie, but it should run properly under other RPi OS.
 
 It is now capable to play Audio (wav/mp3/aif/ogg) / Video (mp4/mov/avi in h264) / Image (bmp/jpg/jpeg/gif/tiff/png) files.
 
@@ -45,12 +46,33 @@ Installation from binary
 If you are running a recent Raspbian on your Pi 1 (armv6), you can simply download the content of the bin folder with the last build. Don't forget the data subfolder which contains the shaders. It will not work without this folder. We will include those extra files into the binary in a futur release for more convinience.
 You will also need to install some dependencies (mainly libfreeimage3), and don't forget to setup the GPU memory split with at least 128mb (you can do it from raspi-config) !
 
-You can use those commands to install dependencies and download the binaries into a HPlayer directory in your HOME folder.
+####0. Setup and Update your RaspberryPi 
+Before anything you should upgrade to the last version and split memory to give at least 128mb to the GPU.
 ```bash
-sudo apt-get install subversion libfreeimage3
-svn export https://github.com/Hemisphere-Project/HPlayer/trunk/bin ~/HPlayer
+sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get dist-upgrade -y
+sudo apt-get install git 
+sudo raspi-config
+	# Expand filesystem
+	# Split GPU memory to 128 (you can set 256 after compiling OF and addons)
+	# Overclock if you want to (recommanded)
+sudo rpi-update
+sudo reboot
 ```
 
+####1. Install HPlayer binary
+You can use those commands to install dependencies and download the binaries into a HPlayer directory in your HOME folder.
+
+on RPI1 (armv6):
+```bash
+sudo apt-get install subversion libfreeimage3
+svn export https://github.com/Hemisphere-Project/HPlayer/trunk/bin/armv6h ~/HPlayer
+```
+
+on RPI2 (armv7):
+```bash
+sudo apt-get install subversion libfreeimage3
+svn export https://github.com/Hemisphere-Project/HPlayer/trunk/bin/armv7h ~/HPlayer
+```
 
 Installation from source
 -------------
@@ -78,41 +100,39 @@ sudo reboot
 ```
 
 
-####1. Download OpenFrameworks, Install dependencies and patch ofxOSC
+####1. Download, Install dependencies and Compile OpenFrameworks
 
-OF 0.8.4 is the current stable release, but doesn't feature a key change that appears in 0F 0.9 future release: the possibility to disable Bundles while forging OSC messages via the now embbeded ofxOsc addon.
-You could download the last OF from github but for simplicity and stability we will use here a patched version of the current 0.8.4 stable OF version. The patch will become obsolete as soon as OF 0.9 is released.
+OF 0.9 is now the current stable release.
+There is a different source tar if you are using RPi 1 or RPi 2.
+Since RPi 2 is Quad-Core the compiling will be much faster by using -j4 on make command.
 
-**Download and install OF**
+Warning: the CPU needs 192mb of RAM to compile OF (and more with addons)
+It is advised to set mem split to GPU in raspi-config at 128mb or lower during compile
+And then switch back to 128/256mb before running HPlayer
 
-on RPI1 (armv6): [http://openframeworks.cc/setup/raspberrypi/Raspberry-Pi-Getting-Started.html] 
+If you encounter issue with this step, you can reffer to detailed instructions here:
+[http://openframeworks.cc/setup/raspberrypi/Raspberry-Pi-Getting-Started.html] 
+
+on RPI1 (armv6):
 ```bash
 cd
-curl -O http://www.openframeworks.cc/versions/v0.8.4/of_v0.8.4_linuxarmv6l_release.tar.gz
+curl -O http://www.openframeworks.cc/versions/v0.9.0/of_v0.9.0_linuxarmv6l_release.tar.gz
 mkdir openFrameworks
-tar vxfz of_v0.8.4_linuxarmv6l_release.tar.gz -C openFrameworks --strip-components 1
-cd ~/openFrameworks/scripts/linux/debian_armv6l
+tar vxfz of_v0.9.0_linuxarmv6l_release.tar.gz -C openFrameworks --strip-components 1
+cd ~/openFrameworks/scripts/linux/debian
 sudo ./install_dependencies.sh
 make Release -C ~/openFrameworks/libs/openFrameworksCompiled/project
 ```
 
-on RPi2 (armv7): [http://forum.openframeworks.cc/t/raspberry-pi-2-setup-guide/18690] 
+on RPi2 (armv7):
 ```bash
 cd
-curl -O http://www.openframeworks.cc/versions/v0.8.4/of_v0.8.4_linuxarmv7l_release.tar.gz
+curl -O http://www.openframeworks.cc/versions/v0.9.0/of_v0.9.0_linuxarmv7l_release.tar.gz
 mkdir openFrameworks
-tar vxfz of_v0.8.4_linuxarmv7l_release.tar.gz -C openFrameworks --strip-components 1
-curl https://raw.githubusercontent.com/openframeworks/openFrameworks/master/libs/openFrameworksCompiled/project/linuxarmv7l/config.linuxarmv7l.rpi2.mk -o ~/openFrameworks/libs/openFrameworksCompiled/project/linuxarmv7l/config.linuxarmv7l.rpi2.mk
+tar vxfz of_v0.9.0_linuxarmv7l_release.tar.gz -C openFrameworks --strip-components 1
 cd ~/openFrameworks/scripts/linux/debian
 sudo ./install_dependencies.sh
-export MAKEFLAGS=-j4 PLATFORM_VARIANT=rpi2
-cd ~/openFrameworks/examples/3d/3DPrimitivesExample/
-make
-```
-
-**Patch ofxOsc** (if you are using an OF version lower than 0.9):
-```bash
-curl https://gist.githubusercontent.com/Maigre/a87adb190943903bbf66/raw/611a038216508e42b012da85705de150667d392b/gistfile1.cpp | patch -N
+make Release -j4 -C ~/openFrameworks/libs/openFrameworksCompiled/project
 ```
 
 ####2. Clone Addons ofxOMXPlayer / ofxArgParser / ofxCrypto
@@ -134,6 +154,8 @@ git clone https://github.com/Hemisphere-Project/HPlayer.git
 cd ~/openFrameworks/apps/myApps/HPlayer
 make
 ```
+
+Note: you can use 'make -j4' on RPi 2 to speed things up...
 
 ####5. Test it 
 ```bash
@@ -244,3 +266,4 @@ We also thank the contributors to this project
 ```
 	++ tpltnt ++
 ```
+

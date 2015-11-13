@@ -4,7 +4,6 @@
 #include "mediaPlayer.h"
 #include "ofxCrypto.h"
 #include "ofxArgParser.h"
-#include "xmlSettings.h"
 #include "oscCom.h"
 
 
@@ -13,14 +12,14 @@
  * openFrameworks.
  */
 class HPlayer : public ofBaseApp
-{	
+{
 	public:
-	
+
 		void setup();
 		void update();
 		void draw();
 		void keyPressed(int key);
-	
+
 	private:
 
 		mediaPlayer player; /*!< container to manage content */

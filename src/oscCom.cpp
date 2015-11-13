@@ -10,12 +10,66 @@
 oscCom::oscCom()
 {
 	portIN = 9000;
-	portOUT = 9001;
+	portOUT = 5000;
 	hostOUT = "localhost";
 	base64 = false;
 	cmdmap = "default";
 	prefix = "";
-    connected = false;
+  connected = false;
+}
+
+/**
+ * Apply settings from XML config file and CMD Line arguments
+ *
+ */
+void oscCom::configure(string file, bool cmdLineOverwrite)
+{
+	// Retrieve config values from settings file
+  if (!file.empty()) {
+		xmlSettings settings(file);
+		portIN 	= settings.conf_int("osc","portIn",portIN);
+		portOUT = settings.conf_int("osc","portOut",portOUT);
+		hostOUT = settings.conf_str("osc","hostOut",hostOUT);
+		base64 = settings.conf_bool("osc","base64",base64);
+		prefix = settings.conf_str("osc","prefix",prefix);
+		cmdmap = settings.conf_str("osc","commands",cmdmap);
+
+		//set default commands
+		settings.conf_str("commands:default","play", "play");
+		settings.conf_str("commands:default","playloop", "playloop");
+		settings.conf_str("commands:default","load", "load");
+		settings.conf_str("commands:default","stop", "stop");
+		settings.conf_str("commands:default","pause", "pause");
+		settings.conf_str("commands:default","resume", "resume");
+		settings.conf_str("commands:default","getStatus", "getStatus");
+		settings.conf_str("commands:default","next", "next");
+		settings.conf_str("commands:default","prev", "prev");
+		settings.conf_str("commands:default","volume", "volume");
+		settings.conf_str("commands:default","mute", "mute");
+		settings.conf_str("commands:default","unmute", "unmute");
+		settings.conf_str("commands:default","loop", "loop");
+		settings.conf_str("commands:default","unloop", "unloop");
+		settings.conf_str("commands:default","blur", "blur");
+		settings.conf_str("commands:default","zoom", "zoom");
+		settings.conf_str("commands:default","info", "info");
+		settings.conf_str("commands:default","host", "host");
+		settings.conf_str("commands:default","quit", "quit");
+
+		//load commands config
+		commander.loadFile(file);
+		commander.pushTag("commands");
+		commander.pushTag(cmdmap);
+	}
+
+	// Retrieve config values from command line arguments
+  if (cmdLineOverwrite) {
+		if (ofxArgParser::hasKey("in")) portIN = ofToInt(ofxArgParser::getValue("in"));
+		if (ofxArgParser::hasKey("out")) portOUT = ofToInt(ofxArgParser::getValue("out"));
+		if (ofxArgParser::hasKey("host")) hostOUT = ofxArgParser::getValue("host");
+		if (ofxArgParser::hasKey("base64")) base64 = (ofToInt(ofxArgParser::getValue("base64")) == 1);
+		if (ofxArgParser::hasKey("cmdmap")) cmdmap = ofxArgParser::getValue("cmdmap");
+		if (ofxArgParser::hasKey("prefix")) prefix = ofxArgParser::getValue("prefix");
+	}
 }
 
 
@@ -26,36 +80,17 @@ oscCom::oscCom()
  */
 void oscCom::connect()
 {
+	// oscReceiver.setup(std::to_string(portIN));
+	// oscReceiver.addAdress("/none", OFXLO_TYPE_NONE);  // with no args
+  // oscReceiver.addAdress("/int", OFXLO_TYPE_INT, 2);
+  // oscReceiver.addAdress("/float", OFXLO_TYPE_FLOAT, 2);
+  // oscReceiver.addAdress("/string", OFXLO_TYPE_STRING,2);
+  // oscReceiver.addAdress("/blob", OFXLO_TYPE_BLOB);
+	// oscReceiver.start();
+
 	oscListener.setup(portIN);
 	oscSender.setup(hostOUT, portOUT);
 	connected = true;
-
-	//set default commands
-	xmlSettings settings("settings.xml");
-	settings.conf_str("commands:default","play", "play");
-	settings.conf_str("commands:default","playloop", "playloop");
-	settings.conf_str("commands:default","load", "load");
-	settings.conf_str("commands:default","stop", "stop");
-	settings.conf_str("commands:default","pause", "pause");
-	settings.conf_str("commands:default","resume", "resume");
-	settings.conf_str("commands:default","getStatus", "getStatus");
-	settings.conf_str("commands:default","next", "next");
-	settings.conf_str("commands:default","prev", "prev");
-	settings.conf_str("commands:default","volume", "volume");
-	settings.conf_str("commands:default","mute", "mute");
-	settings.conf_str("commands:default","unmute", "unmute");
-	settings.conf_str("commands:default","loop", "loop");
-	settings.conf_str("commands:default","unloop", "unloop");
-	settings.conf_str("commands:default","blur", "blur");
-	settings.conf_str("commands:default","zoom", "zoom");
-	settings.conf_str("commands:default","info", "info");
-	settings.conf_str("commands:default","host", "host");
-	settings.conf_str("commands:default","quit", "quit");
-
-	//load config
-	commander.loadFile("settings.xml");
-	commander.pushTag("commands");
-	commander.pushTag(cmdmap);
 }
 
 
@@ -79,21 +114,22 @@ string oscCom::cmd(string command)
 void oscCom::execute(mediaPlayer* player)
 {
 	if (!connected) return;
+
 	if (oscListener.hasWaitingMessages()) oscDebug = "";
-	
+
 	//OSC GET
-	while( oscListener.hasWaitingMessages() ) 
+	while( oscListener.hasWaitingMessages() )
 	{
-        ofxOscMessage m;
-        oscListener.getNextMessage( &m );       
+      ofxOscMessage m;
+      oscListener.getNextMessage( &m );
 
-        //RECEIVED ADDRESS
-        //ofLog(OF_LOG_NOTICE,m.getAddress());
+      //RECEIVED ADDRESS
+      //ofLog(OF_LOG_NOTICE,m.getAddress());
 
-        //GET COMMAND FROM ADDRESS
-        vector<string> address = ofSplitString(m.getAddress(),"/");
+      //GET COMMAND FROM ADDRESS
+      vector<string> address = ofSplitString(m.getAddress(),"/");
    		int key = 0;
-   		if (address[key] == "") key++; 
+   		if (address[key] == "") key++;
 
    		string command = address[key];
    		string postman = "";
@@ -105,7 +141,7 @@ void oscCom::execute(mediaPlayer* player)
    			command = address[key+1];
 
    			//reverse FROM / TO
-   			if (ofIsStringInString(postman, ":")) 
+   			if (ofIsStringInString(postman, ":"))
    			{
    				vector<string> fromto = ofSplitString(postman,":");
    				postman = fromto[1]+":"+fromto[0];
@@ -116,128 +152,128 @@ void oscCom::execute(mediaPlayer* player)
 
    		//EXECUTE COMMAND
 	  	if ((command == cmd("play")) or (command == cmd("playloop")) or (command == cmd("load")))
-		{
-			vector<string> playlist;
-			string filepath;
+			{
+				vector<string> playlist;
+				string filepath;
 
-			for(int k = 0; k < m.getNumArgs(); k++)
-				if ((m.getArgType(k) == OFXOSC_TYPE_STRING) && (m.getArgAsString(k) != "")) 
-				{
-					filepath = m.getArgAsString(k);
-					if (base64) filepath = ofxCrypto::base64_decode(filepath);	
-								
-					playlist.push_back(filepath);		
-				}
+				for(int k = 0; k < m.getNumArgs(); k++)
+					if ((m.getArgType(k) == OFXOSC_TYPE_STRING) && (m.getArgAsString(k) != ""))
+					{
+						filepath = m.getArgAsString(k);
+						if (base64) filepath = ofxCrypto::base64_decode(filepath);
 
-			if (command == cmd("playloop")) player->loop = true;
-			if (playlist.size() > 0) player->load(playlist);
-			else player->load();
-			if (command != cmd("load")) player->play();							
-		}
-		else if(command == cmd("stop"))
-		{
-			player->stop();
-		}
-		else if(command == cmd("pause"))
-		{
-			player->pause();
-		}
-		else if(command == cmd("resume"))
-		{
-			player->resume();
-		}	
-		else if(command == cmd("next"))
-		{
-			player->next();
-		}
-		else if(command == cmd("prev"))
-		{
-			player->prev();
-		}
-		else if(command == cmd("seek"))
-		{
-			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->seek(m.getArgAsInt32(0));
-		}			
-		else if(command == cmd("volume"))
-		{
-			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->volume = m.getArgAsInt32(0);
-			else if(m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->volume = (int) m.getArgAsFloat(0);
-		}
-		else if(command == cmd("mute"))
-		{
-			bool doMute = true;
-			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_INT32)) doMute = (m.getArgAsInt32(0) == 1);
-		
-			player->mute = doMute;
-		}
-		else if(command == cmd("unmute"))
-		{
-			player->mute = false;
-		}
-		else if(command == cmd("loop"))
-		{
-			bool doLoop = true;
-			if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_INT32)) doLoop = (m.getArgAsInt32(0) == 1);
-		
-			player->loop = doLoop;
-		}
-		else if(command == cmd("unloop"))
-		{
-			player->loop = false;
-		}
-		else if(command == cmd("blur"))
-		{
-			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->blur = m.getArgAsInt32(0);
-			else if(m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->blur = (int) m.getArgAsFloat(0);
-		}
-		else if(command == cmd("zoom"))
-		{
-			if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->zoom = m.getArgAsInt32(0);
-			else if(m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->zoom = (int) m.getArgAsFloat(0);
-		}			
-		else if(command == cmd("info"))
-		{
-			player->info = !player->info;
-		}
-		else if(command == cmd("host"))
-		{
-			if ((m.getArgType(0) == OFXOSC_TYPE_STRING) && (m.getArgAsString(0) != "")) hostOUT = m.getArgAsString(0);
-		}
-		else if(command == cmd("getStatus"))
-		{
-			//this->status(player,postman);
-			//will be send since it's a valid command !
-		}				
-		else if(command == cmd("quit"))
-		{
-			ofLog(OF_LOG_NOTICE,"-HP- QUIT ");
-			player->stop();
-			std::exit(0);
-		}
+						playlist.push_back(filepath);
+					}
 
-		//KXKM regie
-		else if(command == cmd("synctest"))
-		{
-			this->statusKXKM(player);
-		}
-		else if(command == cmd("fullsynctest"))
-		{
-			this->ipKXKM(player);
-		}
+				if (command == cmd("playloop")) player->loop = true;
+				if (playlist.size() > 0) player->load(playlist);
+				else player->load();
+				if (command != cmd("load")) player->play();
+			}
+			else if(command == cmd("stop"))
+			{
+				player->stop();
+			}
+			else if(command == cmd("pause"))
+			{
+				player->pause();
+			}
+			else if(command == cmd("resume"))
+			{
+				player->resume();
+			}
+			else if(command == cmd("next"))
+			{
+				player->next();
+			}
+			else if(command == cmd("prev"))
+			{
+				player->prev();
+			}
+			else if(command == cmd("seek"))
+			{
+				if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->seek(m.getArgAsInt32(0));
+			}
+			else if(command == cmd("volume"))
+			{
+				if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->volume = m.getArgAsInt32(0);
+				else if(m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->volume = (int) m.getArgAsFloat(0);
+			}
+			else if(command == cmd("mute"))
+			{
+				bool doMute = true;
+				if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_INT32)) doMute = (m.getArgAsInt32(0) == 1);
 
-		//NOT VALID
-		else 
-		{
-			validCmd = false;
-		}
+				player->mute = doMute;
+			}
+			else if(command == cmd("unmute"))
+			{
+				player->mute = false;
+			}
+			else if(command == cmd("loop"))
+			{
+				bool doLoop = true;
+				if ((m.getNumArgs() > 0) && (m.getArgType(0) == OFXOSC_TYPE_INT32)) doLoop = (m.getArgAsInt32(0) == 1);
 
-		//VALID CMD => send Status!
-		if (validCmd) this->status(player,postman);
+				player->loop = doLoop;
+			}
+			else if(command == cmd("unloop"))
+			{
+				player->loop = false;
+			}
+			else if(command == cmd("blur"))
+			{
+				if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->blur = m.getArgAsInt32(0);
+				else if(m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->blur = (int) m.getArgAsFloat(0);
+			}
+			else if(command == cmd("zoom"))
+			{
+				if(m.getArgType(0) == OFXOSC_TYPE_INT32) player->zoom = m.getArgAsInt32(0);
+				else if(m.getArgType(0) == OFXOSC_TYPE_FLOAT) player->zoom = (int) m.getArgAsFloat(0);
+			}
+			else if(command == cmd("info"))
+			{
+				player->info = !player->info;
+			}
+			else if(command == cmd("host"))
+			{
+				if ((m.getArgType(0) == OFXOSC_TYPE_STRING) && (m.getArgAsString(0) != "")) hostOUT = m.getArgAsString(0);
+			}
+			else if(command == cmd("getStatus"))
+			{
+				//this->status(player,postman);
+				//will be send since it's a valid command !
+			}
+			else if(command == cmd("quit"))
+			{
+				ofLog(OF_LOG_NOTICE,"-HP- QUIT ");
+				player->stop();
+				std::exit(0);
+			}
 
-		//OSC LOG
-		oscDebug += this->oscToString(m)+"\n";
-		//ofLog(OF_LOG_NOTICE,"-HP- OSC "+oscDebug);
-    }	
+			//KXKM regie
+			else if(command == cmd("synctest"))
+			{
+				this->statusKXKM(player);
+			}
+			else if(command == cmd("fullsynctest"))
+			{
+				this->ipKXKM(player);
+			}
+
+			//NOT VALID
+			else
+			{
+				validCmd = false;
+			}
+
+			//VALID CMD => send Status!
+			if (validCmd) this->status(player,postman);
+
+			//OSC LOG
+			oscDebug += this->oscToString(m)+"\n";
+			//ofLog(OF_LOG_NOTICE,"-HP- OSC "+oscDebug);
+    }
 }
 
 
@@ -258,7 +294,7 @@ string oscCom::log() {
  * \see cmd(string command)
  */
 string oscCom::oscToString(ofxOscMessage m) {
-	
+
 	string message = m.getAddress()+" ";
 	for(int i = 0; i < m.getNumArgs(); i++)
 	{
@@ -270,7 +306,7 @@ string oscCom::oscToString(ofxOscMessage m) {
 		else if(m.getArgType(i) == OFXOSC_TYPE_STRING) 	message += m.getArgAsString(i);
 		else message += " unknown";
 	}
-	
+
 	return message;
 }
 
@@ -311,13 +347,13 @@ void oscCom::status(mediaPlayer* player, string response_prefix)
 	{
 		if (player->isPaused()) m.addStringArg("paused");
 		else m.addStringArg("playing");
-		
+
 		m.addStringArg(filepath);
 		m.addIntArg(player->getPositionMs());
 		m.addIntArg(player->getDurationMs());
 		m.addIntArg( (player->loop) ? 1 : 0 );
 	}
-	else 
+	else
 	{
 		m.addStringArg("stoped");
 		m.addStringArg(filepath);
@@ -325,9 +361,9 @@ void oscCom::status(mediaPlayer* player, string response_prefix)
 		m.addIntArg(player->getDurationMs());
 		m.addIntArg( (player->loop) ? 1 : 0 );
 	}
-	
+
 	m.addIntArg(player->volume);
-	
+
 	if (player->mute) m.addStringArg("muted");
 	else m.addStringArg("unmuted");
 
@@ -341,10 +377,10 @@ void oscCom::status(mediaPlayer* player, string response_prefix)
 /**
  * \todo determine use or remove
  */
-void oscCom::end(string file) 
+void oscCom::end(string file)
 {
 	if (!connected) return;
-	
+
 	ofxOscMessage m;
 	m.setAddress(this->prefix+"/end");
 	m.addStringArg(file);
@@ -382,7 +418,7 @@ char* oscCom::getIP()
 void oscCom::statusKXKM(mediaPlayer* player)
 {
 	if (!connected) return;
-	
+
 	ofxOscMessage m;
 	m.setAddress("/"+player->name);
 
@@ -390,15 +426,15 @@ void oscCom::statusKXKM(mediaPlayer* player)
 	m.addStringArg( (player->loop) ? "loop" : "unloop" );
 	m.addStringArg("screen"); //screen or noscreen
 	//m.addStringArg("normal"); //normal or faded
-	
-	
+
+
 	if (player->isPlaying())
 	{
 		m.addStringArg("playmovie");
 		m.addStringArg(ofFilePath::getFileName(player->media()));
 	}
 	else m.addStringArg("stopmovie");
-	
+
 	oscSender.sendMessage(m,false);
 }
 
@@ -408,14 +444,14 @@ void oscCom::statusKXKM(mediaPlayer* player)
  * \param player of which to send the IP
  * \see status(mediaPlayer* player)
  */
-void oscCom::ipKXKM(mediaPlayer* player) 
+void oscCom::ipKXKM(mediaPlayer* player)
 {
 	if (!connected) return;
 
 	ofxOscMessage m;
 	m.setAddress("/"+player->name);
 
-	m.addStringArg("initinfo"); 
+	m.addStringArg("initinfo");
 	m.addStringArg(this->getIP());
 
 	oscSender.sendMessage(m,false);

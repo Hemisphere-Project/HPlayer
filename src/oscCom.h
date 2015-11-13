@@ -2,17 +2,21 @@
 #include "ofxOsc.h"
 #include "mediaPlayer.h"
 #include "ofxCrypto.h"
+#include "ofxArgParser.h"
 #include "xmlSettings.h"
+
+// #include "ofxLoReceiver.h"
 
 
 /**
  * A class to handle the communication of the player via OSC.
  */
 class oscCom
-{	
+{
 	public:
 
 		oscCom();
+		void configure(string file, bool cmdLineOverwrite);
 
 		//CONNECT
 		void	connect();
@@ -27,7 +31,7 @@ class oscCom
 		string	log();
 		string 	oscToString(ofxOscMessage m);
 
-		//SEND	
+		//SEND
 		void 	status(mediaPlayer* player);
 		void 	status(mediaPlayer* player, string postman);
 		void 	end(string file);
@@ -41,13 +45,15 @@ class oscCom
 		bool 	base64; /*!< indicate (need for) base64 encoding of data */
 		string 	cmdmap; /*!< mapping of command strings to OSC */
 		string  prefix; /*!< (internal) prefix for OSC messages */
-		
-		
+
+
 	private:
 
 		bool 	connected;	/*!< indicate active OSC network setup (sender & reciver) */
 		ofxOscSender 	oscSender;	/*!< sender of OSC info [details](http://openframeworks.cc/documentation/ofxOsc/ofxOscSender.html) */
 		ofxOscReceiver  oscListener; /*!< receiver of OSC info [details](http://openframeworks.cc/documentation/ofxOsc/ofxOscReceiver.html) */
 		string 			oscDebug;	/*!< OSC debug messages */
-		ofxXmlSettings commander;	/*!< main configuration */		
+		ofxXmlSettings commander;	/*!< main configuration */
+
+		// ofxLoReceiver oscReceiver;
 };

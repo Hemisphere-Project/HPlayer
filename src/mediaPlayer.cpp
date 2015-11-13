@@ -8,20 +8,21 @@
 mediaPlayer::mediaPlayer()
 {
     //GENERIC PARAMS
-    this->name    = "Raymond";
+    this->name    = "HPlayer";
     this->info    = false;
     this->volume  = 50;
     this->mute    = false;
     this->ahdmi   = false;
     this->loop    = true;
     this->random  = false;
-    
+
     //VIDEO PARAMS
     this->textured = false;
     this->zoom    = 100;
     this->blur    = 0;
 
     //MEDIA
+    this->basePath = "/home/pi/media";
     this->currentIndex = 0;
     this->nextIndex = 0;
 
@@ -33,6 +34,46 @@ mediaPlayer::mediaPlayer()
 
     //IMAGE
     image = new imgPlayer();
+}
+
+/**
+ * Apply settings from XML config file and CMD Line arguments
+ *
+ */
+void mediaPlayer::configure(string file, bool cmdLineOverwrite)
+{
+  // Retrieve config values from settings file
+  if (!file.empty()) {
+    xmlSettings settings(file);
+    this->name = settings.conf_str("system","playerName",this->name);
+  	this->info = settings.conf_bool("system","enableInfo",this->info);
+  	this->volume = settings.conf_int("player","volume",this->volume);
+  	this->ahdmi = settings.conf_bool("player","audioHdmi",this->ahdmi);
+    this->loop = settings.conf_bool("media","loop",this->loop);
+    this->random = settings.conf_bool("media","random",this->random);
+
+  	this->textured = settings.conf_bool("player","textured",this->textured);
+  	this->zoom = settings.conf_int("player","zoom",this->zoom);
+  	this->blur = settings.conf_int("player","blur",this->blur);
+
+  	this->basepath( settings.conf_str("media","path",this->basePath) );
+  }
+
+  // Retrieve config values from command line arguments
+  if (cmdLineOverwrite) {
+    if (ofxArgParser::hasKey("name")) this->name = ofxArgParser::getValue("name");
+  	if (ofxArgParser::hasKey("info")) this->info = (ofToInt(ofxArgParser::getValue("info")) == 1);
+  	if (ofxArgParser::hasKey("volume")) this->volume = ofToInt(ofxArgParser::getValue("volume"));
+  	if (ofxArgParser::hasKey("ahdmi")) this->ahdmi = (ofToInt(ofxArgParser::getValue("ahdmi")) == 1);
+    if (ofxArgParser::hasKey("loop")) this->loop = (ofToInt(ofxArgParser::getValue("loop")) == 1);
+  	if (ofxArgParser::hasKey("ran")) this->random = (ofToInt(ofxArgParser::getValue("ran")) == 1);
+
+  	if (ofxArgParser::hasKey("gl")) this->textured = (ofToInt(ofxArgParser::getValue("gl")) == 1);
+    if (ofxArgParser::hasKey("zoom")) this->zoom = ofToInt(ofxArgParser::getValue("zoom"));
+  	if (ofxArgParser::hasKey("blur")) this->blur = ofToInt(ofxArgParser::getValue("blur"));
+
+    if (ofxArgParser::hasKey("path")) this->basepath( ofxArgParser::getValue("path") );
+  }
 }
 
 /**
@@ -130,7 +171,7 @@ void mediaPlayer::load(vector<string> playlist)
 {
     vector<ofFile> list;
     for(int k = 0; k < playlist.size(); k++)
-    {           
+    {
         ofFile file(playlist[k]);
         if (file.isFile()) list.push_back(file);
         else if (file.isDirectory())
@@ -162,7 +203,7 @@ void mediaPlayer::load(vector<string> playlist)
  */
 void mediaPlayer::load()
 {
-    vector<string> playlist;        
+    vector<string> playlist;
     playlist.push_back(basePath);
     this->load(playlist);
 }
@@ -191,10 +232,9 @@ int mediaPlayer::playlistSize(){
  * \see isPlaying()
  */
 void mediaPlayer::play(vector<string> playlist)
-{   
+{
     this->load(playlist);
-    if (this->playlistSize() > 0) this->play(0);
-    else this->stop();
+    this->play();
 }
 
 
@@ -231,6 +271,7 @@ void mediaPlayer::play(string file)
  */
 void mediaPlayer::play(){
     if (this->playlistSize() > 0) this->play(0);
+    else this->stop();
 }
 
 
@@ -248,16 +289,16 @@ void mediaPlayer::play(){
  */
 void mediaPlayer::play(int index)
 {
-    if ((index >= 0) && (index < this->playlistSize())) 
+    if ((index >= 0) && (index < this->playlistSize()))
     {
         this->currentIndex = index;
-    
+
         ofFile file = mediaFiles[this->currentIndex];
         string ext = ofToLower( file.getExtension() );
 
         //VIDEO
         if (ext == "mp4" or ext == "mov" or ext == "avi" or ext == "m4v")
-        { 
+        {
             sound->stop();
             image->stop();
             video->play( file.path() );
@@ -292,7 +333,7 @@ void mediaPlayer::play(int index)
  * \see prev()
  */
 void mediaPlayer::next()
-{    
+{
     if (this->random) this->nextIndex = (rand() % (int)( this->playlistSize() ));
     else this->nextIndex = this->currentIndex+1;
     //ofLog(OF_LOG_NOTICE, "Random: " + ofToString(this->nextIndex) + " / " + ofToString(this->playlistSize()-1) );
@@ -362,7 +403,7 @@ void mediaPlayer::onSoundFreeze()
  * \see next()
  */
 void mediaPlayer::prev()
-{    
+{
     this->nextIndex = this->currentIndex-1;
 }
 
@@ -378,7 +419,7 @@ void mediaPlayer::prev()
  */
 void mediaPlayer::stop()
 {
-    //VIDEO & SOUND    
+    //VIDEO & SOUND
     video->stop();
     sound->stop();
     image->stop();
@@ -538,15 +579,15 @@ void mediaPlayer::displayInfo() {
     if (video->isPlaying())
     {
         info <<"\n" <<  video->getWidth()<<"x"<< video->getHeight();
-        info <<"\n" <<  video->getCurrentFrameNbr() << " / " << video->getTotalNumFrames(); 
+        info <<"\n" <<  video->getCurrentFrameNbr() << " / " << video->getTotalNumFrames();
     }
 
     if (this->isPlaying())
-        info <<"\n" <<  ofToString(this->getPositionMs()) << " / " << ofToString(this->getDurationMs());  
+        info <<"\n" <<  ofToString(this->getPositionMs()) << " / " << ofToString(this->getDurationMs());
 
     info <<"\n";
     //info <<"\n" << osc.log();
-    ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);    
+    ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);
 }
 
 
@@ -558,7 +599,9 @@ void mediaPlayer::displayInfo() {
  * \see stop()
  */
 void mediaPlayer::displayStandby() {
-    stringstream info;
-    info << " .:: "<<name<<" ::. ";
-    ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);
+    if (!name.empty() && name.compare("no") != 0) {
+      stringstream info;
+      info << " .:: "<<name<<" ::. ";
+      ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);
+    }
 }

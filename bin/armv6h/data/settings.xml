@@ -10,16 +10,16 @@
     <blur>0</blur>
 </player>
 <media>
+    <path>/home/pi/media</path>
     <loop>1</loop>
     <random>0</random>
-    <path>/home/pi/media</path>
 </media>
 <osc>
     <portIn>9000</portIn>
     <portOut>5000</portOut>
     <hostOut>localhost</hostOut>
     <base64>0</base64>
-    <prefix></prefix>
+    <prefix />
     <commands>default</commands>
 </osc>
 <commands>
