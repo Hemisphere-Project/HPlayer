@@ -31,21 +31,21 @@ omPlayer::omPlayer():ofxOMXPlayer()
 void omPlayer::init(bool textured, bool audioHDMI)
 {	
 	//OMXPLAYER Settings
-	settings.videoPath 			= "";
-	settings.useHDMIForAudio 	= audioHDMI;	
-	settings.doFlipTexture		= false; //true on older firmware
-	settings.enableTexture 		= textured;	
-	settings.initialVolume		= 0.5;
-	settings.enableLooping 		= false;
+	_settings.videoPath 		= "";
+	_settings.useHDMIForAudio 	= audioHDMI;	
+	_settings.doFlipTexture		= false; //true on older firmware
+	_settings.enableTexture 	= textured;	
+	_settings.initialVolume		= 0.5;
+	_settings.enableLooping 	= false;
 
 	//params DEFAULTS
-	params.volume = settings.initialVolume;
+	params.volume = _settings.initialVolume;
 	params.mute = false;
 	params.blur = 0;
 	params.zoom = 100;
 
 	//FRAMEBUFFERS
-	if (settings.enableTexture)
+	if (_settings.enableTexture)
 	{
 		//SHADERS
 		blurV.load("VerticalBlur");
@@ -58,10 +58,10 @@ void omPlayer::init(bool textured, bool audioHDMI)
 
 	//ANTIFREEZE
 	lastFrame = 0;
-    freeze = 0;
+    	freeze = 0;
 
 	//START PLAYER
-	this->setup(settings);	
+	this->setup(_settings);	
 }
 
 
@@ -87,10 +87,10 @@ void omPlayer::applyVolume()
 	float v;
 	if (params.mute) v = 0.0;
 	else v = params.volume/100.0;
-	if (v != settings.initialVolume) 
+	if (v != _settings.initialVolume) 
 	{
-		settings.initialVolume = v;
-		this->setVolume(settings.initialVolume);
+		_settings.initialVolume = v;
+		this->setVolume(_settings.initialVolume);
 	}
 }
 
@@ -251,10 +251,6 @@ void omPlayer::blur()
  */
 void omPlayer::play(string file){
 		
-	/*if (this->isPlaying()) this->stop(); 
-	this->settings.videoPath = file;
-	this->setup(this->settings);
-	*/
 	this->loadMovie(file);
 	this->setPaused(false);	
 }

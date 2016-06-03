@@ -85,18 +85,19 @@ class omPlayer : public ofxOMXPlayer
 
 		//BUFFER & SHADER
 		ofShader blurH;  /*!< shader for horizontal blurring */
-        ofShader blurV;  /*!< shader for vertical blurring */
+        	ofShader blurV;  /*!< shader for vertical blurring */
 		ofFbo framebuffer; /*!< plain frambuffer */
-        ofFbo frameblur; /*!< framebuffer for blurring */
+        	ofFbo frameblur; /*!< framebuffer for blurring */
 
 		//PARAMS
 		dims_t			dim; /*!< screen dimensions */
 		params_t		params;	/*!< playback parameters */
+		ofxOMXPlayerSettings 	_settings;
 
 		//END DETECT & ANTIFREEZE
 		int lastFrame; /*!< last frame displayed */
-    	int freeze; /*!< counter for frozen frames (?) \todo reality check */
+    		int freeze; /*!< counter for frozen frames (?) \todo reality check */
 
-    	omListener*	listener; /*!< event listener */
+    		omListener*	listener; /*!< event listener */
 };
 

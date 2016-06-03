@@ -99,7 +99,7 @@ void sndPlayer::play(string file)
 {
     this->stop();
     player = new ofOpenALSoundPlayer();
-    player->loadSound( file, true );
+    player->load( file, true );
     player->play();
 }
 
@@ -112,7 +112,7 @@ void sndPlayer::play(string file)
  */
 bool sndPlayer::isPlaying()
 {
-    return (player != NULL and player->getIsPlaying());
+    return (player != NULL and player->isPlaying());
 }
 
 
@@ -123,7 +123,7 @@ bool sndPlayer::isPlaying()
  */
 bool sndPlayer::isPaused()
 {
-    return (player != NULL and player->getIsPaused());
+    return (player != NULL and player->isPaused());
 }
 
 /**
