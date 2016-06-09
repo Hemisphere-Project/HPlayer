@@ -145,7 +145,7 @@ It will copy the compiled result in ~/HPlayer
 If you want to play with the code, the HPlayer sources are here: ~/openFrameworks/apps/myApps/HPlayer/src
 You can build it with
 ```bash
-cd ~/openFrameworks/apps/myApps/HPlayer/src
+cd ~/openFrameworks/apps/myApps/HPlayer
 make
 ```
 The result will be found in the bin/ subdirectory.
