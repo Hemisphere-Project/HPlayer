@@ -41,18 +41,32 @@ When the effect level is set to 0, the shader is simply bypassed so there is no 
 The player covers the whole screen with a black background and keep video aspect ratio so you don't need to bother with clearing the background like with OMXPlayer. There is also a zoom out function that allow resizing down the video to fit a specific display configuration (textured mode must be enabled)
 
 
-Installation from binary (RASPBIAN)
+Installation from binary (RASPBIAN Jessie)
 -------------
 
 If you are running a recent Raspbian Jessie, you can simply download the content of the bin-raspbian-armv6 folder with the last build. OpenFrameworks 0.9 is set to compile with armv6 instructions set under Raspbian (for various reason). The good point is that the binary is compatible with Raspberries 1, 2 and 3.
 
-Don't forget the data subfolder which contains the shaders. It will not work without this folder. We will include those extra files into the binary in a futur release for more convinience.
-You will also need to install some dependencies (mainly libfreeimage3), and don't forget to setup the GPU memory split with at least 128mb (you can do it from raspi-config) !
+It's better to start from a full Jessie Raspbian (not the Lite one). 
+If you want start from a Jessie Lite please follow "Install from source" since more dependencies are required.
+
+Don't forget the data subfolder which contains the shaders. It will not work without this folder. 
+We will include those extra files into the binary in a futur release for more convinience.
+You will also need to install some dependencies (mainly libfreeimage3), 
+and set the GPU memory split with at least 128mb (you can do it from raspi-config) !
 
 You can use those commands to install dependencies and download the binaries into a HPlayer directory in your HOME folder.
 ```bash
-sudo apt-get install subversion libfreeimage3
+sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get install subversion libfreeimage3 -y
+
 svn export https://github.com/Hemisphere-Project/HPlayer/trunk/bin-raspbian-armv6 ~/HPlayer
+
+sudo raspi-config
+	# Expand filesystem
+	# Split GPU memory to 128 or 256
+	# Bootup in Console
+	# Overclock if you want to (recommanded on RPi 1)
+	# Reboot !
 ```
 
 
