@@ -69,6 +69,18 @@ sudo raspi-config
 	# Reboot !
 ```
 
+To test it:
+
+```bash
+# Download a Test media
+mkdir ~/media && cd ~/media
+wget http://download.openbricks.org/sample/H264/big_buck_bunny_480p_H264_AAC_25fps_1800K.MP4 -O bbb-sample.mp4
+
+# Start HPlayer in autoplay mode
+cd ~/HPlayer
+./HPlayer --start 1
+```
+
 
 Installation from binary (ARCH)
 -------------
