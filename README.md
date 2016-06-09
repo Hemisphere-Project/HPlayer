@@ -106,38 +106,37 @@ HPlayer is build on top of:
 
 ---
 
-####0. Setup and Update your RaspberryPi 
+####0. Prepare your RaspberryPi 
 ```bash
 sudo raspi-config
 	# Expand filesystem
 	# Split GPU memory to 128 or 256
-	# Overclock if you want to (recommanded)
-sudo reboot
+	# Bootup in Console
+	# Overclock if you want to
+	# Reboot !
 ```
 
-####1. Run install script
-You can find a complete installation script here:
+####1. Follow install script
+You can find a complete installation + compilation script here:
 https://gist.github.com/Maigre/1a7f159a81b9f1f96eb1e1d40194ad7f
 
-Or you can directly run it on the RPi with this command:
+You can follow it step by step, or you can directly run it on the RPi with this command:
 ```bash
 bash <(curl -s https://gist.githubusercontent.com/Maigre/1a7f159a81b9f1f96eb1e1d40194ad7f/raw/f8d4640a419d025c91521fec4ef0d0e83f77844b/HPlayer_install_debian)
 ```
 
-####2. Compile it 
-```bash
-cd ~/openFrameworks/apps/myApps/HPlayer
-make
-```
+It will put the compiled result in ~/HPlayer
 
 ####2. Test it 
 ```bash
-cd ~/openFrameworks/apps/myApps/HPlayer/bin
-./HPlayer [--args]
-```
+# Download a Test media
+mkdir ~/media && cd ~/media
+wget http://download.openbricks.org/sample/H264/big_buck_bunny_480p_H264_AAC_25fps_1800K.MP4 -O bbb-sample.mp4
 
-You can copy the content of the ./bin directory to your usual binary path (don't forget the data subdirectory with the shaders !).
-We will provide a "make install" routine as soon as the player become more stable.
+# Start HPlayer in autoplay mode
+cd ~/HPlayer
+./HPlayer --start 1
+```
 
 
 Use it!
