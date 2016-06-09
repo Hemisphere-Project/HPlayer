@@ -1,0 +1,47 @@
+<system>
+    <playerName>HPlayer</playerName>
+    <enableInfo>0</enableInfo>
+</system>
+<player>
+    <volume>50</volume>
+    <audioHdmi>0</audioHdmi>
+    <textured>0</textured>
+    <zoom>100</zoom>
+    <blur>0</blur>
+</player>
+<media>
+    <path>/home/pi/media</path>
+    <loop>1</loop>
+    <random>0</random>
+</media>
+<osc>
+    <portIn>9000</portIn>
+    <portOut>5000</portOut>
+    <hostOut>localhost</hostOut>
+    <base64>0</base64>
+    <prefix />
+    <commands>default</commands>
+</osc>
+<commands>
+    <default>
+        <play>play</play>
+        <playloop>playloop</playloop>
+        <load>load</load>
+        <stop>stop</stop>
+        <pause>pause</pause>
+        <resume>resume</resume>
+        <getStatus>getStatus</getStatus>
+        <next>next</next>
+        <prev>prev</prev>
+        <volume>volume</volume>
+        <mute>mute</mute>
+        <unmute>unmute</unmute>
+        <loop>loop</loop>
+        <unloop>unloop</unloop>
+        <blur>blur</blur>
+        <zoom>zoom</zoom>
+        <info>info</info>
+        <host>host</host>
+        <quit>quit</quit>
+    </default>
+</commands>
