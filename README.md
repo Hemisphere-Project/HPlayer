@@ -126,6 +126,7 @@ sudo raspi-config
 You can find a complete installation + compilation script here that you can follow step by step:
 
 For Raspbian Jessie: https://gist.github.com/Maigre/1a7f159a81b9f1f96eb1e1d40194ad7f
+
 For Arch Linux: https://gist.github.com/Maigre/7f263770298af456d447f7b92c4d19c5
 
 OR you can directly run it on the RPi with this command (for Raspbian):
@@ -139,8 +140,16 @@ or this one (for Arch):
 bash <(curl -s https://gist.githubusercontent.com/Maigre/7f263770298af456d447f7b92c4d19c5/raw/3fd2845157ffb5c3e0a79a46d3a5f1acc773098b/HPlayer_install_arch)
 ```
 
+It will copy the compiled result in ~/HPlayer
 
-It will put the compiled result in ~/HPlayer
+If you want to play with the code, the HPlayer sources are here: ~/openFrameworks/apps/myApps/HPlayer/src
+You can build it with
+```bash
+cd ~/openFrameworks/apps/myApps/HPlayer/src
+make
+```
+The result will be found in the bin/ subdirectory.
+This bin/ directory must contain a data/ subdirectory with the default shaders files.
 
 ####2. Test it 
 ```bash
