@@ -121,7 +121,7 @@ https://gist.github.com/Maigre/1a7f159a81b9f1f96eb1e1d40194ad7f
 
 Or you can directly run it on the RPi with this command:
 ```bash
-bash <(curl -s https://gist.github.com/Maigre/1a7f159a81b9f1f96eb1e1d40194ad7f)
+bash <(curl -s https://gist.githubusercontent.com/Maigre/1a7f159a81b9f1f96eb1e1d40194ad7f/raw/f8d4640a419d025c91521fec4ef0d0e83f77844b/HPlayer_install_debian)
 ```
 
 ####2. Compile it 
