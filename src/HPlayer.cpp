@@ -18,7 +18,7 @@ void HPlayer::setup()
 
 	player.volume = settings.conf_int("player","volume",50);
 	player.ahdmi = settings.conf_bool("player","audioHdmi",false);
-	player.textured = settings.conf_bool("player","textured",false);
+	player.textured = settings.conf_bool("player","textured",true);
 	player.zoom = settings.conf_int("player","zoom",100);
 	player.blur = settings.conf_int("player","blur",0);
 
