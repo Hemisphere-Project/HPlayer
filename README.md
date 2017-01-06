@@ -132,12 +132,12 @@ For Arch Linux: https://gist.github.com/Maigre/7f263770298af456d447f7b92c4d19c5
 OR you can directly run it on the RPi with this command (for Raspbian):
 ```bash
 # RASPBIAN JESSIE
-bash <(curl -s https://gist.githubusercontent.com/Maigre/1a7f159a81b9f1f96eb1e1d40194ad7f/raw/1f58d32937f17fcb39c27bf85064ae81cd302dec/HPlayer_install_debian)
+bash <(curl -s https://gist.githubusercontent.com/Maigre/1a7f159a81b9f1f96eb1e1d40194ad7f/raw/e34a6c93ed84917783c26ee66e4b6367aa82a564/HPlayer_install_debian)
 ```
 or this one (for Arch):
 ```bash
 # ARCH LINUX
-bash <(curl -s https://gist.githubusercontent.com/Maigre/7f263770298af456d447f7b92c4d19c5/raw/bce76de06d4d89a2c1f360c419c05436dca1214d/HPlayer_install_arch)
+bash <(curl -s https://gist.githubusercontent.com/Maigre/7f263770298af456d447f7b92c4d19c5/raw/e29ea04688c29f5971f975ccbc088ccdbde3392c/HPlayer_install_arch)
 ```
 
 It will copy the compiled result in ~/HPlayer
