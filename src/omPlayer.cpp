@@ -29,13 +29,14 @@ omPlayer::omPlayer():ofxOMXPlayer()
  * \see omPlayer()
  */
 void omPlayer::init(bool textured, bool audioHDMI)
-{	
+{
 	//OMXPLAYER Settings
 	_settings.videoPath 		= "";
-	_settings.useHDMIForAudio 	= audioHDMI;	
+	_settings.useHDMIForAudio 	= audioHDMI;
 	_settings.doFlipTexture		= false; //true on older firmware
-	_settings.enableTexture 	= textured;	
+	_settings.enableTexture 	= textured;
 	_settings.initialVolume		= 0.5;
+  _settings.enableAudio 	  = true;
 	_settings.enableLooping 	= false;
 
 	//params DEFAULTS
@@ -61,7 +62,7 @@ void omPlayer::init(bool textured, bool audioHDMI)
     	freeze = 0;
 
 	//START PLAYER
-	this->setup(_settings);	
+	this->setup(_settings);
 }
 
 
@@ -87,7 +88,7 @@ void omPlayer::applyVolume()
 	float v;
 	if (params.mute) v = 0.0;
 	else v = params.volume/100.0;
-	if (v != _settings.initialVolume) 
+	if (v != _settings.initialVolume)
 	{
 		_settings.initialVolume = v;
 		this->setVolume(_settings.initialVolume);
@@ -103,15 +104,15 @@ void omPlayer::iceBreak()
 {
 	//DETECT END / LOOP since Listener in ofxOMX are broken
 	int maxFrame = getTotalNumFrames()-1;
-	int currentFrame = getCurrentFrameNbr();	
+	int currentFrame = getCurrentFrameNbr();
 	if (this->listener != NULL)
 	{
 		//FILE REACH THE END
 		if ((currentFrame == maxFrame) and (lastFrame < maxFrame)) listener->onVideoEnd();
 		//FREEZE detection (due to wrong frame counter)
-		if ((currentFrame == lastFrame) && (!this->isPaused())) 
+		if ((currentFrame == lastFrame) && (!this->isPaused()))
 		{
-			if (freeze++ > 50)  
+			if (freeze++ > 50)
 			{
 				listener->onVideoFreeze();
 				ofLog(OF_LOG_ERROR, "ICE BROKEN");
@@ -144,7 +145,7 @@ void omPlayer::makeRect()
 	}
 	if (!(dim.width > 0)) return;
 
-	//HEIGHT 
+	//HEIGHT
 	dim.height = floor( dim.width * this->getHeight() / this->getWidth() ); //KEEP ASPECT RATIO
 	if (!(dim.height > 0)) return;
 
@@ -187,7 +188,7 @@ void omPlayer::show()
 	framebuffer.end();
 
 	//BLUR
-	if (params.blur > 0) this->blur();	
+	if (params.blur > 0) this->blur();
 
 	//DRAW TO SCREEN
 	framebuffer.draw(0, 0);
@@ -216,11 +217,11 @@ void omPlayer::clearscreen()
  * \see clearscreen()
  */
 void omPlayer::blur()
-{	
-	for(int i = 0; i < 1; i++) 
-	{	
+{
+	for(int i = 0; i < 1; i++)
+	{
 		//BLUR HORIZONTAL
-		frameblur.begin();	
+		frameblur.begin();
 			ofClear(0,0,0,0);
 			blurH.begin();
 				blurH.setUniformTexture("tex0", framebuffer.getTextureReference(0), 0);
@@ -228,7 +229,7 @@ void omPlayer::blur()
 				framebuffer.draw(0,0);
 			blurH.end();
 		frameblur.end();
-			
+
 		//BLUR VERTICAL
 		framebuffer.begin();
 			blurV.begin();
@@ -250,9 +251,9 @@ void omPlayer::blur()
  * \see seek(int timemilli)
  */
 void omPlayer::play(string file){
-		
+
 	this->loadMovie(file);
-	this->setPaused(false);	
+	this->setPaused(false);
 }
 
 
@@ -265,7 +266,7 @@ void omPlayer::play(string file){
  * \see stop()
  */
 void omPlayer::seek(int timemilli){
-		
+
 	//if (this->isPlaying())
 	//int frame = this->timeToFrameMs(timemilli);
 	//TODO
@@ -280,7 +281,7 @@ void omPlayer::seek(int timemilli){
  * \see seek(int timemilli)
  */
 void omPlayer::stop()
-{	
+{
 	this->close();
 	this->clearscreen();
 }
@@ -291,7 +292,7 @@ void omPlayer::stop()
  *
  * \see stop()
  * \see play(string file)
- * \see seek(int timemilli) 
+ * \see seek(int timemilli)
  */
 void omPlayer::pause(){
 	if (this->isPlaying()) this->setPaused(true);
@@ -348,7 +349,7 @@ void omPlayer::setBlur(int blur)
 
 /**
  * Set amount of zooming.
- * 
+ *
  * \param zoom in percent
  * \see setBlur(int blur)
  * \see params_t
@@ -413,4 +414,3 @@ int omPlayer::timeToFrameMs(int timemilli){
     // ?
 	return (frame % this->getTotalNumFrames());
 }
-

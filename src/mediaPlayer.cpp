@@ -15,7 +15,7 @@ mediaPlayer::mediaPlayer()
     this->ahdmi   = false;
     this->loop    = true;
     this->random  = false;
-    
+
     //VIDEO PARAMS
     this->textured = false;
     this->zoom    = 100;
@@ -112,7 +112,7 @@ void mediaPlayer::draw()
     image->show();
 
     //MESSAGE
-    if (!this->isPlaying()) this->displayStandby();
+    //if (!this->isPlaying()) this->displayStandby();
     if (info) this->displayInfo();
 }
 
@@ -130,7 +130,7 @@ void mediaPlayer::load(vector<string> playlist)
 {
     vector<ofFile> list;
     for(int k = 0; k < playlist.size(); k++)
-    {           
+    {
         ofFile file(playlist[k]);
         if (file.isFile()) list.push_back(file);
         else if (file.isDirectory())
@@ -162,7 +162,7 @@ void mediaPlayer::load(vector<string> playlist)
  */
 void mediaPlayer::load()
 {
-    vector<string> playlist;        
+    vector<string> playlist;
     playlist.push_back(basePath);
     this->load(playlist);
 }
@@ -191,7 +191,7 @@ int mediaPlayer::playlistSize(){
  * \see isPlaying()
  */
 void mediaPlayer::play(vector<string> playlist)
-{   
+{
     this->load(playlist);
     if (this->playlistSize() > 0) this->play(0);
     else this->stop();
@@ -248,16 +248,16 @@ void mediaPlayer::play(){
  */
 void mediaPlayer::play(int index)
 {
-    if ((index >= 0) && (index < this->playlistSize())) 
+    if ((index >= 0) && (index < this->playlistSize()))
     {
         this->currentIndex = index;
-    
+
         ofFile file = mediaFiles[this->currentIndex];
         string ext = ofToLower( file.getExtension() );
 
         //VIDEO
         if (ext == "mp4" or ext == "mov" or ext == "avi" or ext == "m4v")
-        { 
+        {
             sound->stop();
             image->stop();
             video->play( file.path() );
@@ -292,7 +292,7 @@ void mediaPlayer::play(int index)
  * \see prev()
  */
 void mediaPlayer::next()
-{    
+{
     if (this->random) this->nextIndex = (rand() % (int)( this->playlistSize() ));
     else this->nextIndex = this->currentIndex+1;
     //ofLog(OF_LOG_NOTICE, "Random: " + ofToString(this->nextIndex) + " / " + ofToString(this->playlistSize()-1) );
@@ -362,7 +362,7 @@ void mediaPlayer::onSoundFreeze()
  * \see next()
  */
 void mediaPlayer::prev()
-{    
+{
     this->nextIndex = this->currentIndex-1;
 }
 
@@ -378,7 +378,7 @@ void mediaPlayer::prev()
  */
 void mediaPlayer::stop()
 {
-    //VIDEO & SOUND    
+    //VIDEO & SOUND
     video->stop();
     sound->stop();
     image->stop();
@@ -538,15 +538,15 @@ void mediaPlayer::displayInfo() {
     if (video->isPlaying())
     {
         info <<"\n" <<  video->getWidth()<<"x"<< video->getHeight();
-        info <<"\n" <<  video->getCurrentFrameNbr() << " / " << video->getTotalNumFrames(); 
+        info <<"\n" <<  video->getCurrentFrameNbr() << " / " << video->getTotalNumFrames();
     }
 
     if (this->isPlaying())
-        info <<"\n" <<  ofToString(this->getPositionMs()) << " / " << ofToString(this->getDurationMs());  
+        info <<"\n" <<  ofToString(this->getPositionMs()) << " / " << ofToString(this->getDurationMs());
 
     info <<"\n";
     //info <<"\n" << osc.log();
-    ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);    
+    ofDrawBitmapStringHighlight(info.str(), 60, 60, ofColor(ofColor::black, 90), ofColor::yellow);
 }
 
 
