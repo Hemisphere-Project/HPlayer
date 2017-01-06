@@ -155,11 +155,11 @@ This bin/ directory must contain a data/ subdirectory with the default shaders f
 ```bash
 # Download a Test media
 mkdir ~/media && cd ~/media
-wget http://download.openbricks.org/sample/H264/big_buck_bunny_480p_H264_AAC_25fps_1800K.MP4 -O bbb-sample.mp4
+wget https://github.com/jvcleave/ofxOMXPlayer/raw/master/video/Timecoded_Big_bunny_1.mov
 
 # Start HPlayer in autoplay mode
 cd ~/HPlayer
-./HPlayer --start 1
+./HPlayer --start 1 --gl 1 --info 1 --ahdmi 1
 ```
 
 
